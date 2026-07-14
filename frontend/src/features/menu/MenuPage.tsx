@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMenu } from "@/hooks/useMenu";
 import { useTableParam } from "@/hooks/useTableParam";
 import { slugify } from "@/lib/utils";
+import { Container } from "@/components/ui/Container";
 import { CategoryNav } from "./CategoryNav";
 import { CategorySection } from "./CategorySection";
 
@@ -36,18 +37,20 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 sm:px-6">
+    <Container className="max-w-2xl pb-24">
       {/* Page heading + dine-in context */}
-      <div className="pt-8">
+      <div className="pt-10">
         <p className="eyebrow">Our Menu</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Menu</h1>
-        <span className="mt-3 inline-block rounded-full bg-surface2 px-3 py-1 text-xs font-medium text-ink">
+        <h1 className="mt-2 text-balance font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">
+          The full menu
+        </h1>
+        <span className="mt-4 inline-flex items-center rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium text-ink">
           {table ? `Dine-in · Table ${table}` : "Takeaway / Pickup"}
         </span>
       </div>
 
       {!loading && !error && names.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-5">
           <CategoryNav categories={names} active={active} onSelect={scrollTo} />
         </div>
       )}
@@ -55,16 +58,16 @@ export default function MenuPage() {
       {loading && <MenuSkeleton />}
 
       {error && (
-        <div className="mt-10 rounded-2xl border border-border bg-surface p-6 text-center">
+        <div className="mt-12 rounded-2xl border border-border bg-surface p-8 text-center shadow-card">
           <p className="font-medium text-ink">We couldn't load the menu</p>
-          <p className="mt-1 text-sm text-muted">{error}</p>
+          <p className="mt-1.5 text-sm text-muted">{error}</p>
         </div>
       )}
 
       {!loading && !error && names.length === 0 && (
-        <div className="mt-10 rounded-2xl border border-border bg-surface p-6 text-center">
+        <div className="mt-12 rounded-2xl border border-border bg-surface p-8 text-center shadow-card">
           <p className="font-medium text-ink">Menu coming soon</p>
-          <p className="mt-1 text-sm text-muted">No items are available right now.</p>
+          <p className="mt-1.5 text-sm text-muted">No items are available right now.</p>
         </div>
       )}
 
@@ -73,16 +76,16 @@ export default function MenuPage() {
         categories.map((c) => (
           <CategorySection key={c.name} name={c.name} items={c.items} />
         ))}
-    </div>
+    </Container>
   );
 }
 
 function MenuSkeleton() {
   return (
-    <div className="mt-8 animate-pulse space-y-6">
+    <div className="mt-10 animate-pulse space-y-7">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex items-start gap-4">
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-2.5">
             <div className="h-4 w-2/3 rounded bg-surface2" />
             <div className="h-3 w-full rounded bg-surface2" />
             <div className="h-4 w-16 rounded bg-surface2" />

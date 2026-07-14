@@ -21,8 +21,9 @@ export function CategoryNav({
               key={slug}
               type="button"
               onClick={() => onSelect(slug)}
+              aria-current={isActive ? "true" : undefined}
               className={cn(
-                "whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                "min-h-[36px] whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors",
                 isActive
                   ? "border-primary bg-primary text-white"
                   : "border-border bg-surface text-muted hover:text-ink"

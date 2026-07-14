@@ -6,6 +6,10 @@ import { useMenu } from "@/hooks/useMenu";
 import { formatPaise } from "@/lib/money";
 import type { MenuItem } from "@/types/db";
 import { ItemImage } from "@/features/menu/ItemImage";
+import { Container } from "@/components/ui/Container";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // A few crowd-pleasers to feature on the landing page.
 const FEATURED_NAMES = [
@@ -32,25 +36,22 @@ export default function HomePage() {
     <div>
       {/* ---- Hero (caramel star surface) ---- */}
       <section className="bg-primary text-white">
-        <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 md:grid-cols-2">
+        <Container className="grid items-center gap-12 py-16 sm:py-24 md:grid-cols-2">
           <div className="reveal">
-            <p className="text-xs font-semibold uppercase tracking-eyebrow text-white/70">
-              {restaurant.tagline}
-            </p>
-            <h1 className="mt-4 whitespace-pre-line font-display text-4xl font-semibold leading-[1.08] sm:text-6xl">
+            <p className="eyebrow eyebrow-invert">{restaurant.tagline}</p>
+            <h1 className="mt-4 whitespace-pre-line text-balance font-display text-[2.5rem] font-semibold leading-[1.06] sm:text-6xl">
               {hero.headline}
             </h1>
-            <p className="mt-5 max-w-md text-white/80">{hero.subcopy}</p>
-            <div className="mt-8 flex flex-wrap items-center gap-5">
-              <Link
-                to="/menu"
-                className="rounded-xl bg-white px-7 py-3.5 text-sm font-semibold uppercase tracking-eyebrow text-primary transition-transform hover:-translate-y-0.5"
-              >
+            <p className="mt-6 max-w-md text-pretty leading-relaxed text-white/80">
+              {hero.subcopy}
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link to="/menu" className={buttonVariants({ variant: "inverse", size: "lg" })}>
                 {hero.ctaLabel}
               </Link>
               <Link
                 to="/our-story"
-                className="text-sm font-medium text-white/90 underline decoration-white/40 underline-offset-4 hover:decoration-white"
+                className="text-sm font-medium text-white/90 underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white"
               >
                 Our story
               </Link>
@@ -63,7 +64,7 @@ export default function HomePage() {
               {hero.imageUrl ? (
                 <img
                   src={hero.imageUrl}
-                  alt={restaurant.name}
+                  alt={`${restaurant.name} — signature dishes`}
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -73,81 +74,77 @@ export default function HomePage() {
               )}
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* ---- Guest favourites ---- */}
       {featured.length > 0 && (
-        <section className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow">Guest favourites</p>
-              <h2 className="mt-1 font-display text-2xl font-semibold text-ink sm:text-3xl">
-                Most-loved at the adda
-              </h2>
+        <section>
+          <Container className="py-16 sm:py-20">
+            <div className="flex items-end justify-between gap-4">
+              <SectionHeading eyebrow="Guest favourites" title="Most-loved at the adda" />
+              <Link
+                to="/menu"
+                className="hidden shrink-0 items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary hover:opacity-80 sm:inline-flex"
+              >
+                Full menu <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
+
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {featured.map((item) => (
+                <Link
+                  key={item.id}
+                  to="/menu"
+                  className="lift block overflow-hidden rounded-2xl border border-border bg-surface shadow-card"
+                >
+                  <div className="aspect-square">
+                    <ItemImage src={item.image_url} alt={item.name} category={item.category} />
+                  </div>
+                  <div className="p-3.5">
+                    <h3 className="line-clamp-1 text-sm font-medium text-ink">{item.name}</h3>
+                    <p className="mt-1 text-sm font-semibold text-primary">
+                      {formatPaise(item.price_paise)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
             <Link
               to="/menu"
-              className="hidden shrink-0 items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary sm:inline-flex"
+              className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary sm:hidden"
             >
               Full menu <ArrowRight className="h-4 w-4" />
             </Link>
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {featured.map((item) => (
-              <Link
-                key={item.id}
-                to="/menu"
-                className="lift block overflow-hidden rounded-2xl border border-border bg-surface shadow-card"
-              >
-                <div className="aspect-square">
-                  <ItemImage src={item.image_url} alt={item.name} category={item.category} />
-                </div>
-                <div className="p-3">
-                  <h3 className="line-clamp-1 text-sm font-medium text-ink">{item.name}</h3>
-                  <p className="mt-1 text-sm font-semibold text-primary">
-                    {formatPaise(item.price_paise)}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <Link
-            to="/menu"
-            className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary sm:hidden"
-          >
-            Full menu <ArrowRight className="h-4 w-4" />
-          </Link>
+          </Container>
         </section>
       )}
 
       {/* ---- Highlights ---- */}
       <section className="border-y border-border bg-surface2/50">
-        <div className="mx-auto grid max-w-5xl gap-6 px-4 py-10 sm:grid-cols-3 sm:px-6">
+        <Container className="grid gap-8 py-12 sm:grid-cols-3">
           {highlights.map((h) => (
             <div key={h.title} className="text-center sm:text-left">
               <p className="font-display text-lg font-semibold text-ink">{h.title}</p>
-              <p className="mt-1 text-sm text-muted">{h.text}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">{h.text}</p>
             </div>
           ))}
-        </div>
+        </Container>
       </section>
 
       {/* ---- Story teaser ---- */}
-      <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
-        <p className="eyebrow">Our Story</p>
-        <h2 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl">
-          {story.heading}
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-muted">{story.paragraphs[0]}</p>
-        <Link
-          to="/our-story"
-          className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary"
-        >
-          Read our story <ArrowRight className="h-4 w-4" />
-        </Link>
+      <section>
+        <Container className="max-w-2xl py-16 text-center sm:py-20">
+          <SectionHeading eyebrow="Our Story" title={story.heading} align="center" />
+          <p className="mt-5 text-pretty leading-relaxed text-muted">{story.paragraphs[0]}</p>
+          <Link
+            to="/our-story"
+            className="mt-7 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary hover:opacity-80"
+          >
+            Read our story <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Container>
       </section>
     </div>
   );

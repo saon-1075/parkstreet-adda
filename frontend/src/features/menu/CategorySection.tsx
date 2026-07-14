@@ -12,8 +12,8 @@ export function CategorySection({
   onAdd?: (item: MenuItem) => void;
 }) {
   return (
-    <section id={slugify(name)} className="scroll-mt-32 pt-8">
-      <div className="mb-1 flex items-center gap-3">
+    <section id={slugify(name)} className="scroll-mt-28 pt-10">
+      <div className="mb-2 flex items-center gap-3">
         <h2 className="font-display text-xl font-semibold text-ink">{name}</h2>
         <span className="h-px flex-1 bg-border" />
       </div>

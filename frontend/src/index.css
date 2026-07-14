@@ -24,6 +24,8 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    /* keep in-page anchors (menu category jumps) clear of the sticky nav */
+    scroll-padding-top: 7rem;
   }
 
   body {
@@ -36,6 +38,18 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* One consistent, accessible focus indicator for every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-ink);
+  }
+
   /* Uppercase, letter-spaced eyebrow label — Cavo-inspired section marker */
   .eyebrow {
     font-family: var(--font-body), system-ui, sans-serif;
@@ -44,6 +58,10 @@
     font-weight: 600;
     font-size: 0.75rem;
     color: var(--color-muted);
+  }
+  /* Eyebrow on the caramel star surface (hero/CTA bands). */
+  .eyebrow-invert {
+    color: rgba(255, 255, 255, 0.75);
   }
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -24,40 +25,54 @@ export function NavBar() {
     <header className="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
         {/* Brand */}
-        <Link to="/" className="font-display text-lg font-semibold tracking-tight text-ink">
+        <Link
+          to="/"
+          className="font-display text-lg font-semibold tracking-tight text-ink"
+        >
           {restaurant.name}
         </Link>
 
-        {/* Desktop links */}
-        <ul className="hidden items-center gap-7 md:flex">
+        {/* Desktop links with animated active underline */}
+        <ul className="hidden items-center gap-8 md:flex">
           {links.map((l) => (
             <li key={l.to}>
               <NavLink
                 to={l.to}
                 end={l.end}
-                className={({ isActive }) =>
-                  cn(
-                    "text-sm font-medium text-muted transition-colors hover:text-ink",
-                    isActive && "text-ink"
-                  )
-                }
+                className="group text-sm font-medium text-muted transition-colors hover:text-ink"
               >
-                {l.label}
+                {({ isActive }) => (
+                  <span className="relative inline-block py-1">
+                    <span className={cn(isActive && "text-ink")}>{l.label}</span>
+                    <span
+                      className={cn(
+                        "absolute -bottom-0.5 left-0 h-0.5 w-full origin-left rounded-full bg-primary transition-transform duration-200",
+                        isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                      )}
+                    />
+                  </span>
+                )}
               </NavLink>
             </li>
           ))}
         </ul>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Link
             to="/menu"
-            className="hidden rounded-xl bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-eyebrow text-white transition-opacity hover:opacity-90 sm:inline-block"
+            className={cn(buttonVariants({ variant: "primary", size: "sm" }), "hidden sm:inline-flex")}
           >
             {restaurant.hero.ctaLabel}
           </Link>
 
-          <CartButton />
+          <Link
+            to="/cart"
+            aria-label="View cart"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-ink hover:bg-surface2"
+          >
+            <ShoppingBag className="h-5 w-5" />
+          </Link>
 
           {/* Mobile hamburger */}
           <button
@@ -65,7 +80,7 @@ export function NavBar() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-surface2 md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-ink hover:bg-surface2 md:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -83,7 +98,7 @@ export function NavBar() {
                   end={l.end}
                   className={({ isActive }) =>
                     cn(
-                      "block rounded-lg px-2 py-3 text-base font-medium text-ink hover:bg-surface2",
+                      "flex min-h-[44px] items-center rounded-lg px-2 text-base font-medium text-ink hover:bg-surface2",
                       isActive && "text-primary"
                     )
                   }
@@ -95,7 +110,7 @@ export function NavBar() {
             <li className="px-2 py-3">
               <Link
                 to="/menu"
-                className="block rounded-xl bg-primary px-4 py-3 text-center text-sm font-semibold uppercase tracking-eyebrow text-white"
+                className={cn(buttonVariants({ variant: "primary", size: "md" }), "w-full")}
               >
                 {restaurant.hero.ctaLabel}
               </Link>
@@ -104,21 +119,5 @@ export function NavBar() {
         </div>
       )}
     </header>
-  );
-}
-
-/**
- * Cart icon in the nav. The item-count badge is wired to the cart in M3;
- * for now it links to the cart page.
- */
-function CartButton() {
-  return (
-    <Link
-      to="/cart"
-      aria-label="View cart"
-      className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-surface2"
-    >
-      <ShoppingBag className="h-5 w-5" />
-    </Link>
   );
 }

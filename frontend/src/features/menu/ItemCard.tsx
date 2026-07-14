@@ -15,17 +15,19 @@ export function ItemCard({
   onAdd?: (item: MenuItem) => void;
 }) {
   return (
-    <div className="flex items-start gap-4 py-4">
+    <div className="flex items-start gap-4 py-5">
       <div className="min-w-0 flex-1">
-        <h3 className="font-medium text-ink">{item.name}</h3>
+        <h3 className="font-medium leading-snug text-ink">{item.name}</h3>
         {item.description && (
-          <p className="mt-1 line-clamp-2 text-sm text-muted">{item.description}</p>
+          <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted">
+            {item.description}
+          </p>
         )}
-        <p className="mt-2 font-semibold text-primary">{formatPaise(item.price_paise)}</p>
+        <p className="mt-2.5 font-semibold text-primary">{formatPaise(item.price_paise)}</p>
       </div>
 
       <div className="relative shrink-0">
-        <div className="h-20 w-20 overflow-hidden rounded-xl border border-border">
+        <div className="h-24 w-24 overflow-hidden rounded-xl border border-border">
           <ItemImage src={item.image_url} alt={item.name} category={item.category} />
         </div>
         {onAdd && (
@@ -33,7 +35,7 @@ export function ItemCard({
             type="button"
             onClick={() => onAdd(item)}
             aria-label={`Add ${item.name}`}
-            className="absolute -bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold uppercase tracking-eyebrow text-white shadow-card"
+            className="absolute -bottom-3 left-1/2 inline-flex min-h-[32px] -translate-x-1/2 items-center gap-1 rounded-full bg-primary px-3 text-xs font-semibold uppercase tracking-eyebrow text-white shadow-card transition-transform active:translate-y-px"
           >
             <Plus className="h-3.5 w-3.5" />
             Add
