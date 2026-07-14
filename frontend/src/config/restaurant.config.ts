@@ -119,14 +119,16 @@ export const restaurant: RestaurantConfig = {
     mapEmbedUrl: null,
   },
   theme: {
-    bg: "#FBF7F0",
-    surface: "#FFFDF9",
-    surface2: "#F1E7D6",
+    // Caramel Cream — light, premium, appetising. Caramel (primary) doubles as
+    // the "star surface" for hero/CTA bands (cream text on caramel).
+    bg: "#FBF6EE",
+    surface: "#FFFFFF",
+    surface2: "#F1E7D8",
     border: "#E7DAC6",
-    ink: "#2A1A12",
-    muted: "#8A7663",
-    primary: "#B5303B",
-    accent: "#C99A3C",
+    ink: "#2C2620",
+    muted: "#8B7E6D",
+    primary: "#A15E2E",
+    accent: "#E0A458",
     whatsapp: "#25D366",
     fontDisplay: "Fraunces",
     fontBody: "Inter",

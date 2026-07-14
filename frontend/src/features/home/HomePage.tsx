@@ -1,40 +1,65 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Coffee, ArrowRight } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
+import { useMenu } from "@/hooks/useMenu";
+import { formatPaise } from "@/lib/money";
+import type { MenuItem } from "@/types/db";
+import { ItemImage } from "@/features/menu/ItemImage";
+
+// A few crowd-pleasers to feature on the landing page.
+const FEATURED_NAMES = [
+  "Kosha Mangsho Kathi Roll",
+  "Mughlai Paratha",
+  "Cold Coffee with Ice Cream",
+  "Nolen Gur Rosogolla (2 pc)",
+];
 
 export default function HomePage() {
   const { hero, highlights, story } = restaurant;
+  const { categories } = useMenu();
+
+  const featured = useMemo<MenuItem[]>(() => {
+    const items = categories.flatMap((c) => c.items);
+    const byName = new Map(items.map((i) => [i.name, i]));
+    const picked = FEATURED_NAMES.map((n) => byName.get(n)).filter(
+      (i): i is MenuItem => Boolean(i)
+    );
+    return picked.length >= 3 ? picked.slice(0, 4) : items.slice(0, 4);
+  }, [categories]);
 
   return (
     <div>
-      {/* ---- Hero ---- */}
-      <section className="mx-auto max-w-5xl px-4 pb-12 pt-10 sm:px-6 sm:pt-16">
-        <div className="grid items-center gap-8 md:grid-cols-2">
-          <div>
-            <p className="eyebrow">{restaurant.tagline}</p>
-            <h1 className="mt-4 whitespace-pre-line font-display text-4xl font-semibold leading-[1.1] text-ink sm:text-5xl">
+      {/* ---- Hero (caramel star surface) ---- */}
+      <section className="bg-primary text-white">
+        <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-24 md:grid-cols-2">
+          <div className="reveal">
+            <p className="text-xs font-semibold uppercase tracking-eyebrow text-white/70">
+              {restaurant.tagline}
+            </p>
+            <h1 className="mt-4 whitespace-pre-line font-display text-4xl font-semibold leading-[1.08] sm:text-6xl">
               {hero.headline}
             </h1>
-            <p className="mt-5 max-w-md text-muted">{hero.subcopy}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <p className="mt-5 max-w-md text-white/80">{hero.subcopy}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-5">
               <Link
                 to="/menu"
-                className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold uppercase tracking-eyebrow text-white transition-opacity hover:opacity-90"
+                className="rounded-xl bg-white px-7 py-3.5 text-sm font-semibold uppercase tracking-eyebrow text-primary transition-transform hover:-translate-y-0.5"
               >
                 {hero.ctaLabel}
               </Link>
               <Link
                 to="/our-story"
-                className="rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold uppercase tracking-eyebrow text-ink transition-colors hover:bg-surface2"
+                className="text-sm font-medium text-white/90 underline decoration-white/40 underline-offset-4 hover:decoration-white"
               >
-                Our Story
+                Our story
               </Link>
             </div>
           </div>
 
-          {/* Hero visual: image if configured, else a warm gradient panel */}
-          <div className="order-first md:order-last">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border shadow-card">
+          {/* Hero visual */}
+          <div className="reveal reveal-delay-1 order-first md:order-last">
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-card">
               {hero.imageUrl ? (
                 <img
                   src={hero.imageUrl}
@@ -42,8 +67,8 @@ export default function HomePage() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-surface2 to-accent/20">
-                  <Coffee className="h-16 w-16 text-accent/70" strokeWidth={1.25} />
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent/40 to-primary/30">
+                  <Coffee className="h-16 w-16 text-white/80" strokeWidth={1.25} />
                 </div>
               )}
             </div>
@@ -51,7 +76,54 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---- Highlights strip ---- */}
+      {/* ---- Guest favourites ---- */}
+      {featured.length > 0 && (
+        <section className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">Guest favourites</p>
+              <h2 className="mt-1 font-display text-2xl font-semibold text-ink sm:text-3xl">
+                Most-loved at the adda
+              </h2>
+            </div>
+            <Link
+              to="/menu"
+              className="hidden shrink-0 items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary sm:inline-flex"
+            >
+              Full menu <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {featured.map((item) => (
+              <Link
+                key={item.id}
+                to="/menu"
+                className="lift block overflow-hidden rounded-2xl border border-border bg-surface shadow-card"
+              >
+                <div className="aspect-square">
+                  <ItemImage src={item.image_url} alt={item.name} category={item.category} />
+                </div>
+                <div className="p-3">
+                  <h3 className="line-clamp-1 text-sm font-medium text-ink">{item.name}</h3>
+                  <p className="mt-1 text-sm font-semibold text-primary">
+                    {formatPaise(item.price_paise)}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <Link
+            to="/menu"
+            className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary sm:hidden"
+          >
+            Full menu <ArrowRight className="h-4 w-4" />
+          </Link>
+        </section>
+      )}
+
+      {/* ---- Highlights ---- */}
       <section className="border-y border-border bg-surface2/50">
         <div className="mx-auto grid max-w-5xl gap-6 px-4 py-10 sm:grid-cols-3 sm:px-6">
           {highlights.map((h) => (
@@ -64,40 +136,18 @@ export default function HomePage() {
       </section>
 
       {/* ---- Story teaser ---- */}
-      <section className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow">Our Story</p>
-          <h2 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl">
-            {story.heading}
-          </h2>
-          <p className="mt-4 text-muted">{story.paragraphs[0]}</p>
-          <Link
-            to="/our-story"
-            className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary"
-          >
-            Read our story
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      {/* ---- Order CTA band ---- */}
-      <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
-        <div className="rounded-2xl bg-primary px-6 py-10 text-center">
-          <h2 className="font-display text-2xl font-semibold text-white sm:text-3xl">
-            Hungry? Order in a tap.
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-white/80">
-            Browse the menu, build your order, and send it straight to us on WhatsApp —
-            or scan the QR at your table for dine-in.
-          </p>
-          <Link
-            to="/menu"
-            className="mt-6 inline-block rounded-xl bg-white px-6 py-3 text-sm font-semibold uppercase tracking-eyebrow text-primary transition-opacity hover:opacity-90"
-          >
-            {hero.ctaLabel}
-          </Link>
-        </div>
+      <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6">
+        <p className="eyebrow">Our Story</p>
+        <h2 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl">
+          {story.heading}
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-muted">{story.paragraphs[0]}</p>
+        <Link
+          to="/our-story"
+          className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-eyebrow text-primary"
+        >
+          Read our story <ArrowRight className="h-4 w-4" />
+        </Link>
       </section>
     </div>
   );

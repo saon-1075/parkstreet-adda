@@ -21,7 +21,9 @@ function item(
     description,
     price_paise,
     category,
-    image_url: null,
+    // Drop a photo at frontend/public/menu/<slug>.webp and it appears here;
+    // missing files fall back to the placeholder (see ItemImage).
+    image_url: `/menu/${slug}.webp`,
     is_available: true,
     sort_order,
     created_at: NOW,

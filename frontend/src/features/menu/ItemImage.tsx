@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Coffee, CakeSlice, UtensilsCrossed } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,8 +9,9 @@ function iconFor(category: string) {
 }
 
 /**
- * Renders the item image, or a warm branded placeholder when image_url is null.
- * Placeholder keeps the menu looking intentional rather than "broken image".
+ * Renders the item image, or a warm branded placeholder when image_url is null
+ * OR the image fails to load. The onError fallback means you can wire image
+ * paths before the files exist — missing photos degrade gracefully.
  */
 export function ItemImage({
   src,
@@ -22,12 +24,15 @@ export function ItemImage({
   category: string;
   className?: string;
 }) {
-  if (src) {
+  const [failed, setFailed] = useState(false);
+
+  if (src && !failed) {
     return (
       <img
         src={src}
         alt={alt}
         loading="lazy"
+        onError={() => setFailed(true)}
         className={cn("h-full w-full object-cover", className)}
       />
     );
@@ -42,7 +47,7 @@ export function ItemImage({
       )}
       aria-hidden="true"
     >
-      <Icon className="h-6 w-6 text-accent/70" strokeWidth={1.5} />
+      <Icon className="h-6 w-6 text-accent" strokeWidth={1.5} />
     </div>
   );
 }

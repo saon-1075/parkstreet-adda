@@ -41,26 +41,32 @@ All colors live in the reskin layer (`src/config/restaurant.config.ts` → `them
 are exposed as CSS variables consumed by Tailwind. **Changing a client's brand = editing
 these values only.**
 
+**Palette: "Caramel Cream"** (v1.1 — replaced the terracotta-red v1). Light, premium,
+appetising. Caramel doubles as the **"star surface"**: hero and CTA bands are filled
+`primary` with cream text — that's the eye-catcher — while menu cards stay light for
+legibility.
+
 | Token | Hex | Use |
 |---|---|---|
-| `bg` | `#FBF7F0` | warm paper-cream app background |
-| `surface` | `#FFFDF9` | item cards (near-white, soft) |
-| `surface2` | `#F1E7D6` | eyebrow sections, subtle bands |
+| `bg` | `#FBF6EE` | warm paper-cream app background |
+| `surface` | `#FFFFFF` | item cards (clean white) |
+| `surface2` | `#F1E7D8` | eyebrow sections, subtle bands |
 | `border` | `#E7DAC6` | hairlines, card edges |
-| `ink` | `#2A1A12` | primary text (deep espresso, high contrast) |
-| `muted` | `#8A7663` | descriptions, secondary text |
-| `primary` | `#B5303B` | primary buttons, prices, brand terracotta |
-| `accent` | `#C99A3C` | highlights, dividers, "new order" cue (gold) |
+| `ink` | `#2C2620` | primary text (warm near-black, high contrast) |
+| `muted` | `#8B7E6D` | descriptions, secondary text |
+| `primary` | `#A15E2E` | caramel — buttons, prices, **and hero/CTA band backgrounds** |
+| `accent` | `#E0A458` | honey — highlights, dividers, "new order" cue |
 | `whatsapp` | `#25D366` | the Order-on-WhatsApp CTA **only** |
 
 **Deliberate exception:** the "Order on WhatsApp" button uses WhatsApp green
-(`#25D366`) rather than the terracotta primary — the green is instantly recognizable
-and reinforces the pitch. It is the *only* place green appears.
+(`#25D366`) rather than the caramel primary — the green is instantly recognizable and
+reinforces the pitch. It is the *only* place green appears.
 
 ### Contrast notes
 - `ink` on `bg` / `surface` → strong contrast, passes for body text.
-- `primary` (terracotta) is used for emphasis and buttons; button text is cream
-  (`#FBF7F0` / white) for legibility.
+- On a caramel (`primary`) surface, text and CTAs are **cream/white** (hero pattern);
+  the primary CTA there inverts to a white button with caramel text.
+- `primary` (caramel) carries white button text and price emphasis on light surfaces.
 - `muted` is for secondary text only — never for essential labels or prices.
 
 ---
@@ -127,9 +133,9 @@ future client is just new token values here.
 ### Current config theme block
 ```ts
 theme: {
-  bg: "#FBF7F0", surface: "#FFFDF9", surface2: "#F1E7D6", border: "#E7DAC6",
-  ink: "#2A1A12", muted: "#8A7663",
-  primary: "#B5303B", accent: "#C99A3C", whatsapp: "#25D366",
+  bg: "#FBF6EE", surface: "#FFFFFF", surface2: "#F1E7D8", border: "#E7DAC6",
+  ink: "#2C2620", muted: "#8B7E6D",
+  primary: "#A15E2E", accent: "#E0A458", whatsapp: "#25D366",
   fontDisplay: "Fraunces", fontBody: "Inter",
 }
 ```

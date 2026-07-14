@@ -8,14 +8,14 @@
  * themed even before JS runs (no flash of unstyled colors).
  */
 :root {
-  --color-bg: #fbf7f0;
-  --color-surface: #fffdf9;
-  --color-surface2: #f1e7d6;
+  --color-bg: #fbf6ee;
+  --color-surface: #ffffff;
+  --color-surface2: #f1e7d8;
   --color-border: #e7dac6;
-  --color-ink: #2a1a12;
-  --color-muted: #8a7663;
-  --color-primary: #b5303b;
-  --color-accent: #c99a3c;
+  --color-ink: #2c2620;
+  --color-muted: #8b7e6d;
+  --color-primary: #a15e2e;
+  --color-accent: #e0a458;
   --color-whatsapp: #25d366;
   --font-display: "Fraunces";
   --font-body: "Inter";
@@ -44,5 +44,35 @@
     font-weight: 600;
     font-size: 0.75rem;
     color: var(--color-muted);
+  }
+}
+
+@layer components {
+  /* Gentle entrance for hero/section reveals. */
+  .reveal {
+    animation: reveal-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .reveal-delay-1 { animation-delay: 0.08s; }
+  .reveal-delay-2 { animation-delay: 0.16s; }
+
+  @keyframes reveal-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Subtle lift on interactive cards. */
+  .lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .lift {
+    animation: none !important;
+    transition: none !important;
   }
 }
