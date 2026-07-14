@@ -55,6 +55,8 @@ export interface RestaurantConfig {
   story: {
     heading: string;
     paragraphs: string[];
+    /** Ambiance shot; null → a styled gradient fallback. */
+    imageUrl: string | null;
   };
   /** Contact & Location page + footer content. */
   contact: {
@@ -108,6 +110,7 @@ export const restaurant: RestaurantConfig = {
   ],
   story: {
     heading: "A space to sip, savour, stay.",
+    imageUrl: "/brand/ambience.webp",
     paragraphs: [
       "Park Street Adda began as a corner table where friends lingered long after the cups ran dry. We wanted to bottle that feeling — unhurried, warm, unmistakably Kolkata — and serve it with the food we grew up on.",
       "Every roll is folded to order, every mutton kosha is slow-cooked for hours, and the chai still comes in a bhaar. Whether you're grabbing a kathi roll on the go or settling in for an evening adda, there's always a seat for you.",
