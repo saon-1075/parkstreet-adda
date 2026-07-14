@@ -39,6 +39,30 @@ export interface RestaurantConfig {
   categoryOrder: string[];
   social: {
     instagram?: string;
+    facebook?: string;
+  };
+  /** Home page hero (brand promotion). */
+  hero: {
+    headline: string;
+    subcopy: string;
+    /** Large hero image; null → a styled gradient fallback. */
+    imageUrl: string | null;
+    ctaLabel: string;
+  };
+  /** Home page "why us" strip. */
+  highlights: { title: string; text: string }[];
+  /** Our Story page content. */
+  story: {
+    heading: string;
+    paragraphs: string[];
+  };
+  /** Contact & Location page + footer content. */
+  contact: {
+    addressLines: string[];
+    phoneDisplay: string;
+    hours: { days: string; time: string }[];
+    /** Google Maps embed URL; null → a link-only fallback. */
+    mapEmbedUrl: string | null;
   };
   theme: RestaurantTheme;
 }
@@ -63,7 +87,36 @@ export const restaurant: RestaurantConfig = {
     "Beverages",
   ],
   social: {
-    instagram: "",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+  },
+  hero: {
+    headline: "Where every adda\nfinds its chai.",
+    subcopy:
+      "Slow-brewed Kolkata comfort food — rolls, kosha mangsho, and clay-cup chai, served the way Park Street remembers it.",
+    imageUrl: null,
+    ctaLabel: "Order Now",
+  },
+  highlights: [
+    { title: "Freshly Folded", text: "Every roll and kathi made to order, never pre-packed." },
+    { title: "Slow-Cooked", text: "Kosha mangsho simmered for hours, the Kolkata way." },
+    { title: "Clay-Cup Chai", text: "Served in a traditional bhaar — aroma included." },
+  ],
+  story: {
+    heading: "A space to sip, savour, stay.",
+    paragraphs: [
+      "Park Street Adda began as a corner table where friends lingered long after the cups ran dry. We wanted to bottle that feeling — unhurried, warm, unmistakably Kolkata — and serve it with the food we grew up on.",
+      "Every roll is folded to order, every mutton kosha is slow-cooked for hours, and the chai still comes in a bhaar. Whether you're grabbing a kathi roll on the go or settling in for an evening adda, there's always a seat for you.",
+    ],
+  },
+  contact: {
+    addressLines: ["12 Park Street", "Kolkata 700016, West Bengal"],
+    phoneDisplay: "+91 98300 00000",
+    hours: [
+      { days: "Mon – Fri", time: "8:00 AM – 11:00 PM" },
+      { days: "Sat – Sun", time: "9:00 AM – 12:00 AM" },
+    ],
+    mapEmbedUrl: null,
   },
   theme: {
     bg: "#FBF7F0",

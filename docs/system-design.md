@@ -333,16 +333,23 @@ mvp/
 │  │  │  ├─ whatsapp.ts           build wa.me prefilled message
 │  │  │  └─ money.ts              paise ↔ ₹ formatting
 │  │  ├─ types/                   Order, MenuItem, OrderItem
+│  │  ├─ data/                    menu fetch (+ mock fallback), grouping
+│  │  ├─ hooks/                   useMenu, useTableParam, useCart …
+│  │  ├─ components/
+│  │  │  ├─ layout/               SiteLayout, NavBar (mobile hamburger), Footer
+│  │  │  └─ ui/                   Button, Sheet, Badge, Toast, EmptyState …
 │  │  ├─ features/
-│  │  │  ├─ menu/                 MenuPage, CategorySection, ItemCard
-│  │  │  ├─ cart/                 CartProvider (localStorage), CartSheet, useCart
+│  │  │  ├─ home/                 HomePage (hero, featured, story teaser, promo)
+│  │  │  ├─ menu/                 MenuPage, CategorySection, ItemCard, ItemImage
+│  │  │  ├─ cart/                 CartProvider (localStorage), CartPage, useCart
 │  │  │  ├─ order/                placeOrder() → RPC + wa.me
+│  │  │  ├─ story/                OurStoryPage
+│  │  │  ├─ contact/              ContactPage (address, hours, map, WhatsApp)
 │  │  │  └─ dashboard/
 │  │  │     ├─ auth/              LoginPage, RequireAuth
 │  │  │     ├─ orders/            OrderBoard, OrderCard, StatusStepper
 │  │  │     └─ menu-admin/        MenuManager, ItemForm, image upload
-│  │  ├─ components/ui/           Button, Sheet, Badge, Toast, EmptyState …
-│  │  ├─ App.tsx                  routes: / (menu) · /dashboard/* (owner)
+│  │  ├─ App.tsx                  routes (see below)
 │  │  └─ main.tsx
 │  ├─ .env.example
 │  ├─ tailwind.config.ts          theme tokens ← restaurant.config theme
@@ -352,9 +359,22 @@ mvp/
 └─ README.md
 ```
 
-Routes: `/` = customer menu (reads `?table=`), `/login`, `/dashboard` (orders),
-`/dashboard/menu` (menu admin). An optional `/dashboard/qr` page can render/print the
-table QR codes from the menu URL.
+Routes — public pages share `SiteLayout` (nav + footer); the owner area is separate:
+
+| Route | Page | Notes |
+|---|---|---|
+| `/` | Home | brand hero, featured items, story teaser, Order Now |
+| `/menu` | Menu | ordering menu; **QR deep-links here** with `?table=` |
+| `/cart` | Cart / Checkout | review → Order on WhatsApp |
+| `/our-story` | Our Story | brand narrative from config |
+| `/contact` | Contact & Location | address, hours, phone/WhatsApp, map |
+| `/login` | Owner login | Supabase Auth |
+| `/dashboard` | Order board | auth-gated; not in public nav |
+| `/dashboard/menu` | Menu admin | owner CRUD |
+| `/dashboard/qr` | QR (optional) | print table QR codes |
+
+The cart lives in a `CartProvider` above the layout, so it persists across every
+public page. Brand content (hero/story/contact/hours/socials) is config-driven.
 
 ---
 

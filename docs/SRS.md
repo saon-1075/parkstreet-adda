@@ -25,10 +25,20 @@ per client, re-skinned via a config layer.
 
 ## 2. Scope
 
+> **Scope note (v1.1):** the customer side is a **mobile-first brand website that also
+> takes orders** — a multi-page site (Home, Menu, Cart, Our Story, Contact) with a
+> persistent nav + footer — not only a single QR menu. The QR deep-links to the Menu
+> page. This strengthens the sales story (a real business website, not just a menu).
+
 ### 2.1 In Scope (MVP)
 
-1. **Mobile-first digital menu** opened via QR code. QR encodes a menu URL with an
-   optional `?table=` parameter for dine-in table context.
+0. **Multi-page brand website** (mobile-first, responsive): persistent nav bar (with
+   mobile hamburger + always-visible cart) and footer, wrapping routed pages — **Home**
+   (brand promotion: hero, featured items, story teaser, Order Now), **Our Story**, and
+   **Contact & Location** (address, hours, phone/WhatsApp, map). All brand content is
+   config-driven.
+1. **Mobile-first digital menu** (the `/menu` page) opened via QR code. QR encodes the
+   menu URL with an optional `?table=` parameter for dine-in table context.
 2. **Cart + WhatsApp ordering.** Customer builds a cart and taps *"Order on WhatsApp"*.
    The order is persisted to the database, then a pre-filled WhatsApp message
    (itemized order + total + table) opens to the owner's number via a `wa.me` link.

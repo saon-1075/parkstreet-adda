@@ -1,193 +1,174 @@
 # Build Roadmap
 
-**Product:** Direct-Ordering Restaurant Site (MVP)
-**Companions:** [SRS.md](./SRS.md) · [system-design.md](./system-design.md)
-**Version:** 1.0
-**Date:** 2026-07-13
+**Product:** Brand website + direct-ordering web app (MVP)
+**Companions:** [SRS.md](./SRS.md) · [system-design.md](./system-design.md) · [design-system.md](./design-system.md)
+**Version:** 2.0 — *revised for a multi-page brand + ordering site*
+**Date:** 2026-07-14
 
 ---
 
 ## How to read this
 
-Each milestone is **small, sequenced, and independently testable** — you can run and
-verify it before we move on. Every milestone lists: **Goal → Build → ✅ Verify (on
-your phone/browser)**. We build in this order; I pause after each for you to confirm.
+Each milestone is **small, sequenced, and independently testable**. Every milestone
+lists: **Goal → Build → ✅ Verify**. We build in order; I pause after each for you to
+run and confirm.
 
-Legend: 🧱 scaffolding · 🎨 customer-facing · 🔐 owner-facing · 🌱 data · 🚀 deploy
+**Scope shift (v2):** the customer side is now a full **mobile-first brand website that
+also takes orders** — a persistent nav + footer wrapping routed pages (Home, Menu,
+Cart, Our Story, Contact) — not just a single QR menu. The QR deep-links to `/menu`.
+Owner side (dashboard) is unchanged.
 
-**Critical path to a live demo:** M0 → M1 → M2 → M3 → M4 → M6 → M7 → M9.
-M5 (menu CRUD) and M8 (polish) can be reordered around your first demo date.
+Legend: 🧱 scaffold · 🎨 customer site · 🔐 owner · 🌱 data · 🚀 deploy
+
+**Status:** ✅ M0 done · ✅ M1 done (SQL written, unrun) · ▶️ M2 in progress
 
 ---
 
-## M0 — Project scaffold & "hello, deployed" 🧱🚀
+## ✅ M0 — Project scaffold & theme 🧱
+Vite + React + TS + Tailwind, `frontend/` + `backend/` split, config-driven theme
+(light niche-cafe), routing shell, Supabase client. *Done — deploy deferred.*
 
-**Goal:** A blank but real app running locally *and* live on Vercel, wired to Supabase.
+## ✅ M1 — Database layer 🌱
+Schema, enums, RLS, `place_order()` RPC, realtime, and the Park Street Adda seed
+(20 items + sample orders). *Done — SQL written, to be run against Supabase later.*
+
+---
+
+## M2 — App shell, navigation & Home 🧱🎨
+
+**Goal:** The site frame is real: persistent nav + footer on every page, working
+routing between all pages, and a branded Home landing.
 
 **Build:**
-- Vite + React + TypeScript + Tailwind; mobile-first base styles.
-- `src/config/restaurant.config.ts` stub + theme tokens → Tailwind.
-- `src/lib/supabase.ts` from env; `.env.example`.
-- Create Supabase project; add URL + anon key to env (local + Vercel).
-- Routing shell: `/` (menu placeholder) and `/dashboard` (placeholder).
-- Deploy to Vercel.
+- `SiteLayout` (nav + `<Outlet/>` + footer) wrapping all public routes.
+- **NavBar**: logo/name, desktop links (Home · Menu · Our Story · Contact),
+  **Order Now** button, always-visible **cart icon** (count wired in M3); mobile
+  **hamburger** menu.
+- **Footer**: hours, address, socials, WhatsApp — all from config.
+- **Home page**: brand hero (image, tagline, **Order Now → /menu** CTA), a short
+  *Our Story* teaser, a promo strip. (Featured-items row added in M4 once item cards exist.)
+- Placeholder bodies for Menu / Cart / Our Story / Contact.
+- Extend `restaurant.config.ts` with `hero`, `story`, `contact` content.
 
-**✅ Verify:** Local dev shows a themed placeholder page; the Vercel URL opens the
-same on your phone. No data yet — just proof the pipeline is real.
+**✅ Verify:** On your phone, the nav + footer show on every page; hamburger works;
+you can navigate Home ↔ Menu ↔ Our Story ↔ Contact; Home looks like a real cafe
+landing. (`npm run dev` — no DB needed.)
 
 ---
 
-## M1 — Database schema, RLS & seed 🌱
+## M3 — Menu page + cart 🎨
 
-**Goal:** All tables, enums, RLS, the `place_order()` RPC, and the seeded cafe exist.
+**Goal:** Browse the full menu and add items to a persistent cart.
 
 **Build:**
-- `supabase/migrations/` — enums, `menu_items`, `orders`, `order_items`, indexes,
-  RLS policies, `place_order()` RPC (all from system-design §3–5).
-- `supabase/seed.sql` — **Park Street Adda** with ~18 items across the config
-  categories, realistic ₹ prices, placeholder images; a few sample orders in mixed
-  statuses so the dashboard looks alive.
+- **Menu page** `/menu`: sticky category nav, item rows (name/desc/price/image),
+  grouped by config category order; reads `?table=`. (Uses the M2-era data layer +
+  mock fallback.)
+- **Cart state**: `CartProvider` backed by localStorage (survives reload + page nav);
+  **Add / +/- / remove**; cart-icon **count** + running total go live.
+- Mini-cart drawer or sticky "View cart" bar.
 
-**✅ Verify:** In the Supabase table editor you see the seeded menu + sample orders.
-Running `place_order()` from the SQL editor with a test payload returns a `short_code`
-and inserts a correct order (total computed server-side).
+**✅ Verify:** Add items from the menu, change quantities, navigate to another page and
+back — cart persists; the nav cart-count and total are correct.
 
----
+## M4 — Cart page + WhatsApp checkout 🎨🌱
 
-## M2 — Customer menu (read-only) 🎨
-
-**Goal:** The QR-landing menu looks production-real on a phone.
-
-**Build:**
-- Fetch `menu_items` (anon, available only), group by category using
-  `config.categoryOrder`.
-- `MenuPage`, `CategorySection`, `ItemCard`: name, description, ₹ price, image/
-  placeholder, availability handling.
-- Header with cafe brand from config; sticky category nav; loading & empty states.
-- Read `?table=` and show a subtle "Table 5" chip.
-
-**✅ Verify:** Open the Vercel URL (and `?table=5`) on your phone — the seeded menu
-renders cleanly, grouped, scrollable, with the table chip. Feels like a real cafe.
-
----
-
-## M3 — Cart 🎨
-
-**Goal:** Add items, adjust quantities, see a live total — persisted on device.
+**Goal:** The money moment — review cart, place order to DB, open prefilled WhatsApp.
+Plus featured items on Home.
 
 **Build:**
-- `CartProvider` backed by localStorage (survives reload); `useCart`.
-- Add / increment / decrement / remove; running subtotal + total via `money.ts`.
-- Floating cart bar + `CartSheet`; optional name + note fields; empty-cart state.
+- **Cart/Checkout page** `/cart`: line items, totals, optional name + note, table context.
+- **Order on WhatsApp**: `place_order()` RPC → build `wa.me` message → open → clear
+  cart → confirmation. Error path preserves the cart.
+- **Home featured items** row (reuses the menu item card).
 
-**✅ Verify:** Add items, change quantities, reload the page — cart persists and the
-total is correct in ₹.
+**✅ Verify:** From cart, tap Order on WhatsApp → correct itemized message opens → (once
+DB is wired) the order lands in Supabase with the right total.
 
----
+## M5 — Our Story + Contact & Location 🎨
 
-## M4 — Place order → WhatsApp 🎨🌱
-
-**Goal:** The core money moment: order saved to DB, then WhatsApp opens prefilled.
-
-**Build:**
-- `placeOrder()` calls the `place_order()` RPC (table, name, note, items).
-- On success: build the `wa.me` message in `lib/whatsapp.ts` (cafe name, table, each
-  `qty × item = ₹sub`, total, note, order code), open it, clear cart, show confirmation.
-- On failure: error toast, cart preserved (SRS FR-C9).
-
-**✅ Verify:** Place an order on your phone → WhatsApp opens with a correct itemized
-message to the configured number → the order appears in the Supabase `orders` table
-with the right total and a `short_code`.
-
----
-
-## M5 — Owner auth + live order board 🔐
-
-**Goal:** Owner logs in and watches orders arrive **live**.
+**Goal:** The brand pages that make it a real website.
 
 **Build:**
-- Supabase Auth (email+password); create the owner account; `LoginPage` + `RequireAuth`.
-- `OrderBoard` reads existing orders, then subscribes via the `OrderStream`
-  (Supabase Realtime) abstraction; new orders animate in with a cue.
-- `OrderCard`: items, total, table, note, code, timestamp, status.
+- **Our Story** `/our-story`: narrative + imagery from config.
+- **Contact & Location** `/contact`: address, hours, phone + WhatsApp buttons, map embed.
 
-**✅ Verify:** Log in on one device; place an order from another (or your phone) →
-it pops into the board within ~1–2s without refresh. Logged-out users are redirected.
+**✅ Verify:** Both pages render from config, look polished on mobile, and the
+call/WhatsApp/map actions work.
 
 ---
 
-## M6 — Order status flow 🔐
+## M6 — Owner auth + live order board 🔐
 
-**Goal:** Owner drives each order `placed → accepted → preparing → ready → done`
-(+ cancel), reflected live.
+**Goal:** Owner logs in and watches orders arrive live.
 
-**Build:**
-- `StatusStepper` / action buttons → `update` on `orders`; realtime UPDATE syncs any
-  open board.
-- Active vs Done filter/segment.
+**Build:** Supabase Auth (email+password), `LoginPage` + `RequireAuth`; `OrderBoard`
+reads existing orders then subscribes via the `OrderStream` (Supabase Realtime)
+abstraction; new orders animate in with a cue; `OrderCard` shows items/total/table/
+note/code/time/status.
 
-**✅ Verify:** Advance an order through every status on one device and watch it update
-live on a second. Cancel works from a non-terminal state.
+**✅ Verify:** Log in on one device; place an order from another → it pops into the
+board in ~1–2s without refresh. Logged-out users are redirected.
 
----
+## M7 — Order status flow 🔐
 
-## M7 — Owner menu management (CRUD) 🔐
+**Goal:** Drive each order `placed → accepted → preparing → ready → done` (+ cancel),
+reflected live.
+
+**✅ Verify:** Advance an order through every status on one device, watch it sync live
+on a second. Cancel works from a non-terminal state.
+
+## M8 — Owner menu management (CRUD) 🔐
 
 **Goal:** Owner manages the menu without touching the database.
 
-**Build:**
-- `MenuManager` list; `ItemForm` create/edit (name, description, ₹ price ↔ paise,
-  category, availability); delete with confirm.
-- Availability toggle; image upload to Supabase Storage (`menu-images`) with placeholder
-  fallback.
+**Build:** `MenuManager` list; `ItemForm` create/edit (name, desc, ₹↔paise, category,
+availability); delete w/ confirm; availability toggle; image upload to Supabase
+Storage with placeholder fallback.
 
-**✅ Verify:** Add an item, edit a price, toggle one unavailable, delete one →
-reload the customer menu and see every change reflected correctly.
+**✅ Verify:** Add/edit/toggle/delete an item → reload the customer menu and see every
+change reflected.
 
 ---
 
-## M8 — Production-real polish 🎨
+## M9 — Production-real polish 🎨
 
-**Goal:** Removes every "demo smell" so it closes deals.
+Loading skeletons, empty/error states, toasts, tap targets ≥44px; micro-interactions
+(add-to-cart feedback, new-order highlight + sound); real copy, favicon, OG/share
+meta, `theme-color`; final brand pass from config.
+
+**✅ Verify:** Walk every flow on a mid-range phone over mobile data — nothing janky,
+broken, or placeholder. Passes as a shipped product.
+
+## M10 — Deploy, demo kit & reskin proof 🚀
+
+**Goal:** Live and demo-ready — and proven reusable.
 
 **Build:**
-- Consistent loading skeletons, empty/error states, toasts; tap targets ≥44px.
-- Micro-interactions (add-to-cart feedback, new-order highlight + optional sound).
-- Real copy, favicon, share/OG meta, `theme-color`; verify contrast/legibility.
-- Final brand pass from `restaurant.config` (colours, logo, tagline).
+- **Wire the database**: create Supabase project, run migrations + seed, create owner
+  login, verify every flow end-to-end against real data.
+- **Deploy** frontend to Vercel (root dir = `frontend`) with env vars → live URL.
+- Optional `/dashboard/qr` to print table QR codes.
+- **Demo script** + DB reset/reseed snippet to reset between prospects.
+- **Reskin proof**: swap `restaurant.config.ts` + reseed to a second fictional cafe,
+  redeploy — confirm zero code changes needed.
 
-**✅ Verify:** Walk all flows on a mid-range phone over mobile data — nothing feels
-janky, broken, or placeholder. Would pass as a shipped product to a stranger.
+**✅ Verify:** Printed QR → menu → order → live dashboard, end to end on the public URL.
+Then reskin to cafe #2 in minutes with only config + seed edits.
 
 ---
 
-## M9 — Demo kit & reskin proof 🚀
-
-**Goal:** You can walk into a meeting and it just works — and prove reusability.
-
-**Build:**
-- Optional `/dashboard/qr` page to render/print table QR codes from the live URL.
-- Short **demo script** (what to click, in what order) + a DB reset/reseed snippet to
-  reset the demo between prospects.
-- **Reskin proof:** swap `restaurant.config.ts` + reseed to a second fictional cafe,
-  redeploy — confirm zero code changes needed (SRS acceptance #8).
-
-**✅ Verify:** From a printed QR → menu → order → dashboard, end to end on the live
-URL. Then reskin to cafe #2 in minutes with only config + seed edits.
-
----
-
-## Milestone dependency map
+## Dependency map
 
 ```
-M0 ─► M1 ─► M2 ─► M3 ─► M4 ─┬─► M5 ─► M6 ─► M8 ─► M9
-                            └─► M7 ─────────┘
+M0 ─► M1 ─► M2 ─► M3 ─► M4 ─► M5 ─┐
+                                   ├─► M9 ─► M10
+            M6 ─► M7 ─► M8 ────────┘
 ```
-M7 (menu CRUD) depends on M1 + auth from M5 but is otherwise independent of the
-order-flow chain — buildable in parallel or deferred past a first demo.
+Owner side (M6–M8) depends only on M1; it can be built in parallel with the customer
+pages if needed. Everything converges at polish (M9) and deploy (M10).
 
----
-
-## Deferred (post-MVP upsells — not in this roadmap)
+## Deferred (post-MVP upsells)
 Razorpay prepaid checkout · WhatsApp Business API · AI customer assistant ·
-multi-tenant single deployment. All seams already reserved in the System Design.
+multi-tenant single deployment · Offers/Deals & Gallery pages. Seams reserved in the
+System Design.

@@ -1,65 +1,95 @@
-import { Link } from "react-router-dom";
-import { restaurant } from "@/config/restaurant.config";
-
-const swatches: { label: string; token: string }[] = [
-  { label: "bg", token: "var(--color-bg)" },
-  { label: "surface", token: "var(--color-surface)" },
-  { label: "surface2", token: "var(--color-surface2)" },
-  { label: "primary", token: "var(--color-primary)" },
-  { label: "accent", token: "var(--color-accent)" },
-  { label: "whatsapp", token: "var(--color-whatsapp)" },
-];
+import { useEffect, useMemo, useState } from "react";
+import { useMenu } from "@/hooks/useMenu";
+import { useTableParam } from "@/hooks/useTableParam";
+import { slugify } from "@/lib/utils";
+import { CategoryNav } from "./CategoryNav";
+import { CategorySection } from "./CategorySection";
 
 export default function MenuPage() {
+  const table = useTableParam();
+  const { categories, loading, error } = useMenu();
+  const [active, setActive] = useState("");
+
+  const names = useMemo(() => categories.map((c) => c.name), [categories]);
+
+  // Scroll-spy: highlight the category currently in view.
+  useEffect(() => {
+    if (!categories.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-140px 0px -70% 0px", threshold: 0 }
+    );
+    names.forEach((name) => {
+      const el = document.getElementById(slugify(name));
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [categories, names]);
+
+  const scrollTo = (slug: string) => {
+    document.getElementById(slug)?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <div className="min-h-dvh bg-bg text-ink">
-      <div className="mx-auto max-w-md px-5 py-10">
-        <p className="eyebrow mb-3">Digital Menu</p>
-
-        <h1 className="font-display text-4xl font-semibold leading-tight">
-          {restaurant.name}
-        </h1>
-        <p className="mt-2 text-muted">{restaurant.tagline}</p>
-
-        <div className="mt-8 rounded-2xl border border-border bg-surface p-6 shadow-card">
-          <p className="eyebrow mb-2 text-accent">Milestone 0</p>
-          <h2 className="font-display text-xl font-semibold">Project shell is live</h2>
-          <p className="mt-2 text-sm text-muted">
-            The theme, fonts, routing and deploy pipeline are wired up. The real
-            menu arrives in <span className="text-ink">M2</span>.
-          </p>
-        </div>
-
-        <div className="mt-8">
-          <p className="eyebrow mb-3">Palette check</p>
-          <div className="grid grid-cols-6 gap-2">
-            {swatches.map((s) => (
-              <div key={s.label} className="text-center">
-                <div
-                  className="h-10 w-full rounded-lg border border-border"
-                  style={{ backgroundColor: s.token }}
-                />
-                <span className="mt-1 block text-[10px] text-muted">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-10 flex items-center gap-3">
-          <button className="rounded-xl bg-primary px-5 py-3 text-sm font-semibold uppercase tracking-eyebrow text-bg">
-            Primary button
-          </button>
-          <button className="rounded-xl bg-whatsapp px-5 py-3 text-sm font-semibold uppercase tracking-eyebrow text-white">
-            WhatsApp
-          </button>
-        </div>
-
-        <div className="mt-10 border-t border-border pt-6 text-sm">
-          <Link to="/dashboard" className="text-primary underline underline-offset-4">
-            Owner dashboard →
-          </Link>
-        </div>
+    <div className="mx-auto max-w-2xl px-4 pb-24 sm:px-6">
+      {/* Page heading + dine-in context */}
+      <div className="pt-8">
+        <p className="eyebrow">Our Menu</p>
+        <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Menu</h1>
+        <span className="mt-3 inline-block rounded-full bg-surface2 px-3 py-1 text-xs font-medium text-ink">
+          {table ? `Dine-in · Table ${table}` : "Takeaway / Pickup"}
+        </span>
       </div>
+
+      {!loading && !error && names.length > 0 && (
+        <div className="mt-4">
+          <CategoryNav categories={names} active={active} onSelect={scrollTo} />
+        </div>
+      )}
+
+      {loading && <MenuSkeleton />}
+
+      {error && (
+        <div className="mt-10 rounded-2xl border border-border bg-surface p-6 text-center">
+          <p className="font-medium text-ink">We couldn't load the menu</p>
+          <p className="mt-1 text-sm text-muted">{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && names.length === 0 && (
+        <div className="mt-10 rounded-2xl border border-border bg-surface p-6 text-center">
+          <p className="font-medium text-ink">Menu coming soon</p>
+          <p className="mt-1 text-sm text-muted">No items are available right now.</p>
+        </div>
+      )}
+
+      {!loading &&
+        !error &&
+        categories.map((c) => (
+          <CategorySection key={c.name} name={c.name} items={c.items} />
+        ))}
+    </div>
+  );
+}
+
+function MenuSkeleton() {
+  return (
+    <div className="mt-8 animate-pulse space-y-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-start gap-4">
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-2/3 rounded bg-surface2" />
+            <div className="h-3 w-full rounded bg-surface2" />
+            <div className="h-4 w-16 rounded bg-surface2" />
+          </div>
+          <div className="h-20 w-20 rounded-xl bg-surface2" />
+        </div>
+      ))}
     </div>
   );
 }
