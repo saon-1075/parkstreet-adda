@@ -74,7 +74,7 @@ export const restaurant: RestaurantConfig = {
   tagline: "Kolkata's living-room cafe",
   // Circular brand seal, served from frontend/public/brand/. Shown beside the
   // wordmark in the nav/footer; falls back to the wordmark alone if absent.
-  logoUrl: "/brand/logo.png",
+  logoUrl: "/brand/logo.webp",
   whatsappNumber: "919830000000", // demo placeholder — swap for the owner's real number
   currency: "₹",
   dineIn: {
@@ -100,7 +100,7 @@ export const restaurant: RestaurantConfig = {
       "Slow-brewed Kolkata comfort food — rolls, kosha mangsho, and clay-cup chai, served the way Park Street remembers it.",
     // Served from frontend/public/brand/. Falls back to a gradient placeholder
     // if the file is missing, so a reskin can drop this or swap it freely.
-    imageUrl: "/brand/banner.png",
+    imageUrl: "/brand/banner.webp",
     ctaLabel: "Order Now",
   },
   highlights: [

@@ -7,7 +7,19 @@ real files exist, so you can add them incrementally.
 ## Golden rule
 **One consistent treatment across every image.** Warm natural light, a similar angle
 (top-down or ~45°), a similar surface (wood / marble / cane). Consistency reads as
-"real brand" far more than any single perfect photo. Export **WebP**, compressed.
+"real brand" far more than any single perfect photo.
+
+## Always run the optimiser after adding images
+Source photos arrive far larger than we render them (a 2.7 MB photo in a 96px thumb).
+Drop files in at any size, then:
+
+```bash
+cd frontend && npm run optimize:images
+```
+
+It resizes + re-encodes everything to WebP in place (dishes → 800×800, banner → 1600w,
+logo → 512, ambience → 1600×900). It's re-runnable, and originals stay in git history.
+First pass took the demo from **16.19 MB → 1.05 MB (−94%)**.
 
 ## What's needed
 
