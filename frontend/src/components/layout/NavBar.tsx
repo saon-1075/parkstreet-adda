@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
 import { buttonVariants } from "@/components/ui/button";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -25,11 +26,11 @@ export function NavBar() {
     <header className="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
         {/* Brand */}
-        <Link
-          to="/"
-          className="font-display text-lg font-semibold tracking-tight text-ink"
-        >
-          {restaurant.name}
+        <Link to="/" className="flex items-center gap-2.5">
+          <BrandMark className="h-9 w-9" />
+          <span className="font-display text-lg font-semibold tracking-tight text-ink">
+            {restaurant.name}
+          </span>
         </Link>
 
         {/* Desktop links with animated active underline */}

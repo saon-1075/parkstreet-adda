@@ -16,7 +16,7 @@ real files exist, so you can add them incrementally.
 | **Dish photos** | 20 (min ~8) | 800×800 (1:1) | `frontend/public/menu/<slug>.webp` |
 | **Banner / hero image** | 1 ✅ | ~1920×1280 (3:2) | `frontend/public/brand/banner.png` → `hero.imageUrl` in config *(in place)* |
 | **Ambiance** | 1–2 | 1600×900 (16:9) | `frontend/public/brand/story.webp` |
-| **Logo** | 1 | SVG (wordmark + mark) | `frontend/public/brand/logo.svg` → set `logoUrl` in config |
+| **Logo** | 1 ✅ | circular seal | `frontend/public/brand/logo.png` → `logoUrl` in config *(in place)* |
 | **Social / OG** | 1 | 1200×630 | `frontend/public/brand/og.webp` |
 | **Favicon** | 1 | 512×512 | `frontend/public/brand/favicon.png` |
 

@@ -3,6 +3,7 @@ import { MapPin, Clock } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
 import { whatsappLink } from "@/lib/whatsapp";
 import { Container } from "@/components/ui/Container";
+import { BrandMark } from "@/components/ui/BrandMark";
 
 const socialPill =
   "inline-flex min-h-[36px] items-center rounded-full border border-border px-3 text-xs font-medium text-ink transition-colors hover:bg-surface";
@@ -15,8 +16,11 @@ export function Footer() {
       <Container className="grid gap-10 py-14 sm:grid-cols-3">
         {/* Brand */}
         <div>
-          <p className="font-display text-lg font-semibold text-ink">{restaurant.name}</p>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{restaurant.tagline}</p>
+          <div className="flex items-center gap-3">
+            <BrandMark className="h-14 w-14" />
+            <p className="font-display text-lg font-semibold text-ink">{restaurant.name}</p>
+          </div>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{restaurant.tagline}</p>
           <div className="mt-5 flex flex-wrap gap-2">
             {social.instagram && (
               <a href={social.instagram} target="_blank" rel="noreferrer" className={socialPill}>

@@ -70,7 +70,9 @@ export interface RestaurantConfig {
 export const restaurant: RestaurantConfig = {
   name: "Park Street Adda",
   tagline: "Kolkata's living-room cafe",
-  logoUrl: null,
+  // Circular brand seal, served from frontend/public/brand/. Shown beside the
+  // wordmark in the nav/footer; falls back to the wordmark alone if absent.
+  logoUrl: "/brand/logo.png",
   whatsappNumber: "919830000000", // demo placeholder — swap for the owner's real number
   currency: "₹",
   dineIn: {
