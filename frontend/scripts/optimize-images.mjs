@@ -21,20 +21,38 @@ const MENU_DIR = path.join(ROOT, "public/menu");
 const BRAND_DIR = path.join(ROOT, "public/brand");
 
 /** Rendered at ~96px thumb / ~400px featured card → 800px square is ample (2x). */
-const DISH = { width: 800, height: 800, fit: "cover", quality: 78 };
+const DISH = { width: 800, height: 800, fit: "cover", quality: 78, maxBytes: 200 * 1024 };
 
 const BRAND_TARGETS = {
   "banner.png": { out: "banner.webp", width: 1600, fit: "inside", quality: 80 },
   "logo.png": { out: "logo.webp", width: 512, height: 512, fit: "inside", quality: 88 },
-  "ambience.webp": { out: "ambience.webp", width: 1600, height: 900, fit: "cover", quality: 80 },
+  "ambience.webp": {
+    out: "ambience.webp",
+    width: 1600,
+    height: 900,
+    fit: "cover",
+    quality: 80,
+    maxBytes: 250 * 1024,
+  },
 };
+
+/**
+ * Re-encoding an already-optimised image loses a little quality every pass, and
+ * this script is re-run each time a photo is added. So skip anything already
+ * within its target dimensions and byte budget.
+ */
+async function isAlreadyOptimised(input, size, opts) {
+  if (!opts.maxBytes || size > opts.maxBytes) return false;
+  const meta = await sharp(input).metadata();
+  if (meta.format !== "webp") return false;
+  return meta.width <= opts.width && meta.height <= (opts.height ?? Infinity);
+}
 
 const mb = (b) => (b / 1024 / 1024).toFixed(2);
 let before = 0;
 let after = 0;
 
-async function encode(srcPath, destPath, opts) {
-  const input = await readFile(srcPath); // full read → no lingering file handle
+async function encode(srcPath, destPath, opts, input) {
   const output = await sharp(input)
     .resize({
       width: opts.width,
@@ -55,7 +73,14 @@ async function optimiseDishes() {
     const sizeBefore = (await stat(src)).size;
     before += sizeBefore;
 
-    const sizeAfter = await encode(src, src, DISH);
+    const input = await readFile(src); // full read → no lingering file handle
+    if (await isAlreadyOptimised(input, sizeBefore, DISH)) {
+      after += sizeBefore;
+      console.log(`  menu/${file.padEnd(28)} ${mb(sizeBefore).padStart(6)} MB     — skipped (already optimised)`);
+      continue;
+    }
+
+    const sizeAfter = await encode(src, src, DISH, input);
     after += sizeAfter;
 
     const saved = Math.round((1 - sizeAfter / sizeBefore) * 100);
@@ -77,8 +102,15 @@ async function optimiseBrand() {
     }
     before += sizeBefore;
 
+    const input = await readFile(src);
+    if (cfg.out === file && (await isAlreadyOptimised(input, sizeBefore, cfg))) {
+      after += sizeBefore;
+      console.log(`  brand/${file.padEnd(27)} ${mb(sizeBefore).padStart(6)} MB     — skipped (already optimised)`);
+      continue;
+    }
+
     const dest = path.join(BRAND_DIR, cfg.out);
-    const sizeAfter = await encode(src, dest, cfg);
+    const sizeAfter = await encode(src, dest, cfg, input);
     after += sizeAfter;
 
     // Drop the heavy original once replaced by a differently-named output.
