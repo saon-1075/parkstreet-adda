@@ -23,6 +23,8 @@ export const buttonVariants = cva(
         whatsapp: "bg-whatsapp text-white hover:opacity-90",
       },
       size: {
+        // compact pill — e.g. the floating "Add" control on menu item cards
+        xs: "min-h-[32px] px-3 text-xs",
         sm: "min-h-[40px] px-4 text-xs",
         md: "min-h-[44px] px-6 text-sm",
         lg: "min-h-[52px] px-7 text-sm",

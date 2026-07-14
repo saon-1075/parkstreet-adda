@@ -1,6 +1,8 @@
 import { Plus } from "lucide-react";
 import type { MenuItem } from "@/types/db";
 import { formatPaise } from "@/lib/money";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ItemImage } from "./ItemImage";
 
 /**
@@ -35,7 +37,10 @@ export function ItemCard({
             type="button"
             onClick={() => onAdd(item)}
             aria-label={`Add ${item.name}`}
-            className="absolute -bottom-3 left-1/2 inline-flex min-h-[32px] -translate-x-1/2 items-center gap-1 rounded-full bg-primary px-3 text-xs font-semibold uppercase tracking-eyebrow text-white shadow-card transition-transform active:translate-y-px"
+            className={cn(
+              buttonVariants({ variant: "primary", size: "xs" }),
+              "absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full shadow-card"
+            )}
           >
             <Plus className="h-3.5 w-3.5" />
             Add

@@ -94,7 +94,9 @@ export const restaurant: RestaurantConfig = {
     headline: "Where every adda\nfinds its chai.",
     subcopy:
       "Slow-brewed Kolkata comfort food — rolls, kosha mangsho, and clay-cup chai, served the way Park Street remembers it.",
-    imageUrl: null,
+    // Served from frontend/public/brand/. Falls back to a gradient placeholder
+    // if the file is missing, so a reskin can drop this or swap it freely.
+    imageUrl: "/brand/banner.png",
     ctaLabel: "Order Now",
   },
   highlights: [

@@ -82,15 +82,15 @@ export default function MenuPage() {
 
 function MenuSkeleton() {
   return (
-    <div className="mt-10 animate-pulse space-y-7">
+    <div className="mt-10 space-y-7" role="status" aria-label="Loading menu">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex items-start gap-4">
           <div className="flex-1 space-y-2.5">
-            <div className="h-4 w-2/3 rounded bg-surface2" />
-            <div className="h-3 w-full rounded bg-surface2" />
-            <div className="h-4 w-16 rounded bg-surface2" />
+            <div className="skeleton h-4 w-2/3 rounded" />
+            <div className="skeleton h-3 w-full rounded" />
+            <div className="skeleton h-4 w-16 rounded" />
           </div>
-          <div className="h-20 w-20 rounded-xl bg-surface2" />
+          <div className="skeleton h-20 w-20 rounded-xl" />
         </div>
       ))}
     </div>

@@ -23,10 +23,10 @@ export function CategoryNav({
               onClick={() => onSelect(slug)}
               aria-current={isActive ? "true" : undefined}
               className={cn(
-                "min-h-[36px] whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors",
+                "min-h-[36px] whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors duration-200",
                 isActive
                   ? "border-primary bg-primary text-white"
-                  : "border-border bg-surface text-muted hover:text-ink"
+                  : "border-border bg-surface text-muted hover:border-primary/40 hover:bg-surface2 hover:text-ink"
               )}
             >
               {name}

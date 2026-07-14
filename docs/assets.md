@@ -14,7 +14,7 @@ real files exist, so you can add them incrementally.
 | Asset | Count | Size | Drop at |
 |---|---|---|---|
 | **Dish photos** | 20 (min ~8) | 800×800 (1:1) | `frontend/public/menu/<slug>.webp` |
-| **Hero image** | 1 | ~1920×1280 (3:2) | `frontend/public/brand/hero.webp` → set `hero.imageUrl` in config |
+| **Banner / hero image** | 1 ✅ | ~1920×1280 (3:2) | `frontend/public/brand/banner.png` → `hero.imageUrl` in config *(in place)* |
 | **Ambiance** | 1–2 | 1600×900 (16:9) | `frontend/public/brand/story.webp` |
 | **Logo** | 1 | SVG (wordmark + mark) | `frontend/public/brand/logo.svg` → set `logoUrl` in config |
 | **Social / OG** | 1 | 1200×630 | `frontend/public/brand/og.webp` |

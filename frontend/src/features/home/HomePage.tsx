@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Coffee, ArrowRight } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
@@ -22,6 +22,7 @@ const FEATURED_NAMES = [
 export default function HomePage() {
   const { hero, highlights, story } = restaurant;
   const { categories } = useMenu();
+  const [bannerFailed, setBannerFailed] = useState(false);
 
   const featured = useMemo<MenuItem[]>(() => {
     const items = categories.flatMap((c) => c.items);
@@ -60,11 +61,12 @@ export default function HomePage() {
 
           {/* Hero visual */}
           <div className="reveal reveal-delay-1 order-first md:order-last">
-            <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-card">
-              {hero.imageUrl ? (
+            <div className="aspect-[3/2] overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-card">
+              {hero.imageUrl && !bannerFailed ? (
                 <img
                   src={hero.imageUrl}
-                  alt={`${restaurant.name} — signature dishes`}
+                  alt={`${restaurant.name} — clay-cup chai and kathi rolls on a marble table`}
+                  onError={() => setBannerFailed(true)}
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -121,13 +123,13 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ---- Highlights ---- */}
-      <section className="border-y border-border bg-surface2/50">
+      {/* ---- Highlights (caramel star surface, matches hero treatment) ---- */}
+      <section className="border-y border-white/10 bg-primary">
         <Container className="grid gap-8 py-12 sm:grid-cols-3">
           {highlights.map((h) => (
             <div key={h.title} className="text-center sm:text-left">
-              <p className="font-display text-lg font-semibold text-ink">{h.title}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">{h.text}</p>
+              <p className="font-display text-lg font-semibold text-white">{h.title}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-white/80">{h.text}</p>
             </div>
           ))}
         </Container>
