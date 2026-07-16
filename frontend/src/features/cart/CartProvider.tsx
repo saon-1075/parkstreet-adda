@@ -9,6 +9,7 @@ import {
 import type { MenuItem } from "@/types/db";
 
 const STORAGE_KEY = "psa-cart-v1";
+const TABLE_KEY = "psa-table-v1";
 
 /** A cart line snapshots the menu item so a later menu edit can't corrupt it. */
 export interface CartLine {
@@ -30,6 +31,9 @@ interface CartContextValue {
   decrement: (id: string) => void;
   remove: (id: string) => void;
   clear: () => void;
+  // dine-in context, carried from the QR ?table= param through checkout
+  tableLabel: string | null;
+  setTable: (label: string | null) => void;
   // drawer UI state (co-located so any control can open the cart)
   isOpen: boolean;
   openCart: () => void;
@@ -64,6 +68,23 @@ function loadInitial(): CartLine[] {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>(loadInitial);
   const [isOpen, setIsOpen] = useState(false);
+  const [tableLabel, setTableLabel] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(TABLE_KEY);
+    } catch {
+      return null;
+    }
+  });
+
+  const setTable = useCallback((label: string | null) => {
+    setTableLabel(label);
+    try {
+      if (label) localStorage.setItem(TABLE_KEY, label);
+      else localStorage.removeItem(TABLE_KEY);
+    } catch {
+      /* ignore storage errors */
+    }
+  }, []);
 
   // Persist on every change.
   useEffect(() => {
@@ -149,11 +170,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       decrement,
       remove,
       clear,
+      tableLabel,
+      setTable,
       isOpen,
       openCart,
       closeCart,
     }),
-    [lines, totalQuantity, totalPaise, quantityOf, add, increment, decrement, remove, clear, isOpen, openCart, closeCart]
+    [lines, totalQuantity, totalPaise, quantityOf, add, increment, decrement, remove, clear, tableLabel, setTable, isOpen, openCart, closeCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

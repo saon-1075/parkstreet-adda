@@ -1,17 +1,76 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Trash2, ArrowLeft } from "lucide-react";
+import { ShoppingBag, Trash2, ArrowLeft, CheckCircle2, MessageCircle } from "lucide-react";
 import { formatPaise } from "@/lib/money";
-import { useTableParam } from "@/hooks/useTableParam";
 import { Container } from "@/components/ui/Container";
 import { buttonVariants } from "@/components/ui/button";
 import { ItemImage } from "@/features/menu/ItemImage";
+import { placeOrder, type PlaceOrderResult } from "@/features/order/placeOrder";
 import { useCart } from "./CartProvider";
 import { QtyStepper } from "./QtyStepper";
 
 export default function CartPage() {
-  const { lines, totalQuantity, totalPaise, increment, decrement, remove, clear } = useCart();
-  const table = useTableParam();
+  const { lines, totalQuantity, totalPaise, increment, decrement, remove, clear, tableLabel } =
+    useCart();
 
+  const [name, setName] = useState("");
+  const [note, setNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState<PlaceOrderResult | null>(null);
+
+  async function handleCheckout() {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await placeOrder({ lines, tableLabel, customerName: name, note });
+      // Best-effort auto-open; the confirmation screen has a manual link too.
+      window.open(result.whatsappUrl, "_blank");
+      setConfirmation(result);
+      clear();
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "We couldn't place your order. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // ---- Confirmation ----
+  if (confirmation) {
+    return (
+      <Container className="max-w-2xl py-16 sm:py-20">
+        <div className="rounded-2xl border border-border bg-surface p-10 text-center shadow-card">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-whatsapp/15">
+            <CheckCircle2 className="h-7 w-7 text-whatsapp" />
+          </div>
+          <h1 className="mt-5 font-display text-2xl font-semibold text-ink">
+            Order #{confirmation.shortCode} placed
+          </h1>
+          <p className="mx-auto mt-2 max-w-sm text-pretty text-sm leading-relaxed text-muted">
+            We've opened WhatsApp with your order — just hit send. If it didn't open, tap below.
+          </p>
+          <a
+            href={confirmation.whatsappUrl}
+            target="_blank"
+            rel="noreferrer"
+            className={`${buttonVariants({ variant: "whatsapp", size: "lg" })} mt-6`}
+          >
+            <MessageCircle className="h-4 w-4" />
+            Open WhatsApp
+          </a>
+          <div className="mt-6">
+            <Link to="/menu" className="text-sm font-medium text-primary hover:opacity-80">
+              Back to menu
+            </Link>
+          </div>
+        </div>
+      </Container>
+    );
+  }
+
+  // ---- Empty ----
   if (lines.length === 0) {
     return (
       <Container className="max-w-2xl py-16 sm:py-20">
@@ -31,6 +90,7 @@ export default function CartPage() {
     );
   }
 
+  // ---- Review + checkout ----
   return (
     <Container className="max-w-2xl py-10 sm:py-14">
       <Link
@@ -46,7 +106,7 @@ export default function CartPage() {
           <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Review &amp; checkout</h1>
         </div>
         <span className="shrink-0 rounded-full bg-surface2 px-3 py-1.5 text-xs font-medium text-ink">
-          {table ? `Dine-in · Table ${table}` : "Takeaway / Pickup"}
+          {tableLabel ? `Dine-in · Table ${tableLabel}` : "Takeaway / Pickup"}
         </span>
       </div>
 
@@ -97,7 +157,37 @@ export default function CartPage() {
         Clear cart
       </button>
 
-      {/* Summary */}
+      {/* Details */}
+      <div className="mt-6 space-y-4">
+        <div>
+          <label htmlFor="cust-name" className="mb-1.5 block text-sm font-medium text-ink">
+            Your name <span className="font-normal text-muted">(optional)</span>
+          </label>
+          <input
+            id="cust-name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Riya"
+            className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted"
+          />
+        </div>
+        <div>
+          <label htmlFor="cust-note" className="mb-1.5 block text-sm font-medium text-ink">
+            Note for the kitchen <span className="font-normal text-muted">(optional)</span>
+          </label>
+          <textarea
+            id="cust-note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={2}
+            placeholder="e.g. less spicy, no onion"
+            className="w-full resize-none rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted"
+          />
+        </div>
+      </div>
+
+      {/* Summary + checkout */}
       <div className="mt-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
         <div className="flex items-center justify-between">
           <span className="text-muted">
@@ -108,16 +198,21 @@ export default function CartPage() {
           </span>
         </div>
 
-        {/* WhatsApp checkout is wired in M4 (order persistence + wa.me message). */}
+        {error && (
+          <p className="mt-4 rounded-lg bg-primary/10 px-3 py-2 text-sm text-primary">{error}</p>
+        )}
+
         <button
           type="button"
-          disabled
-          className={`${buttonVariants({ variant: "whatsapp", size: "lg" })} mt-5 w-full`}
+          onClick={handleCheckout}
+          disabled={submitting}
+          className={`${buttonVariants({ variant: "whatsapp", size: "lg" })} mt-5 w-full disabled:opacity-60`}
         >
-          Order on WhatsApp
+          <MessageCircle className="h-4 w-4" />
+          {submitting ? "Placing order…" : "Order on WhatsApp"}
         </button>
         <p className="mt-2 text-center text-xs text-muted">
-          Sending your order on WhatsApp is being wired up next.
+          Opens WhatsApp with your order pre-filled — you just hit send.
         </p>
       </div>
     </Container>
