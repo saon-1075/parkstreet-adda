@@ -4,6 +4,7 @@ import { Menu, X, ShoppingBag } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/ui/BrandMark";
+import { useCart } from "@/features/cart/CartProvider";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -67,13 +68,7 @@ export function NavBar() {
             {restaurant.hero.ctaLabel}
           </Link>
 
-          <Link
-            to="/cart"
-            aria-label="View cart"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-ink hover:bg-surface2"
-          >
-            <ShoppingBag className="h-5 w-5" />
-          </Link>
+          <CartButton />
 
           {/* Mobile hamburger */}
           <button
@@ -120,5 +115,25 @@ export function NavBar() {
         </div>
       )}
     </header>
+  );
+}
+
+/** Cart icon with a live item-count badge; opens the mini-cart drawer. */
+function CartButton() {
+  const { totalQuantity, openCart } = useCart();
+  return (
+    <button
+      type="button"
+      onClick={openCart}
+      aria-label={`View cart, ${totalQuantity} ${totalQuantity === 1 ? "item" : "items"}`}
+      className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl text-ink hover:bg-surface2"
+    >
+      <ShoppingBag className="h-5 w-5" />
+      {totalQuantity > 0 && (
+        <span className="absolute right-1 top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white tabular-nums">
+          {totalQuantity}
+        </span>
+      )}
+    </button>
   );
 }

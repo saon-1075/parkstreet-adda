@@ -111,12 +111,30 @@
       transform: translateX(100%);
     }
   }
+
+  /* Cart drawer entrance. */
+  .cart-backdrop {
+    animation: fade-in 0.2s ease both;
+  }
+  .cart-panel {
+    animation: slide-in-right 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .lift,
-  .skeleton::after {
+  .skeleton::after,
+  .cart-backdrop,
+  .cart-panel {
     animation: none !important;
     transition: none !important;
   }

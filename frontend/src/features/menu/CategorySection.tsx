@@ -2,15 +2,7 @@ import type { MenuItem } from "@/types/db";
 import { slugify } from "@/lib/utils";
 import { ItemCard } from "./ItemCard";
 
-export function CategorySection({
-  name,
-  items,
-  onAdd,
-}: {
-  name: string;
-  items: MenuItem[];
-  onAdd?: (item: MenuItem) => void;
-}) {
+export function CategorySection({ name, items }: { name: string; items: MenuItem[] }) {
   return (
     <section id={slugify(name)} className="scroll-mt-28 pt-10">
       <div className="mb-2 flex items-center gap-3">
@@ -19,7 +11,7 @@ export function CategorySection({
       </div>
       <div className="divide-y divide-border">
         {items.map((item) => (
-          <ItemCard key={item.id} item={item} onAdd={onAdd} />
+          <ItemCard key={item.id} item={item} />
         ))}
       </div>
     </section>

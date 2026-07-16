@@ -3,6 +3,7 @@ import { useMenu } from "@/hooks/useMenu";
 import { useTableParam } from "@/hooks/useTableParam";
 import { slugify } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
+import { CartBar } from "@/features/cart/CartBar";
 import { CategoryNav } from "./CategoryNav";
 import { CategorySection } from "./CategorySection";
 
@@ -76,6 +77,8 @@ export default function MenuPage() {
         categories.map((c) => (
           <CategorySection key={c.name} name={c.name} items={c.items} />
         ))}
+
+      <CartBar />
     </Container>
   );
 }
