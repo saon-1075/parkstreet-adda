@@ -1,41 +1,43 @@
 -- ============================================================================
 -- M1 · Seed · Park Street Adda (fictional Kolkata cafe)
 -- Run AFTER the migrations. Idempotent-ish: truncates first so re-seeding is safe.
--- Prices are in PAISE (₹1 = 100 paise). Images are null → UI shows a placeholder.
+-- Prices are in PAISE (₹1 = 100 paise). image_url points at the static photos in
+-- frontend/public/menu/<slug>.webp (served by the app); a missing file falls back
+-- to the placeholder icon in the UI. Keep these paths in sync with the photos.
 -- ============================================================================
 
 truncate table public.order_items, public.orders restart identity cascade;
 truncate table public.menu_items restart identity cascade;
 
 -- ---- Menu (20 items across the config categories) --------------------------
-insert into public.menu_items (name, description, price_paise, category, sort_order) values
+insert into public.menu_items (name, description, price_paise, category, image_url, sort_order) values
   -- Chai & Coffee
-  ('Bhaar-er Cha',              'Cutting chai served in a traditional clay cup',        3000,  'Chai & Coffee', 1),
-  ('Elaichi Malai Chai',       'Slow-boiled cardamom milk tea',                        5000,  'Chai & Coffee', 2),
-  ('Cold Coffee with Ice Cream','Thick cold coffee topped with vanilla',               12000, 'Chai & Coffee', 3),
+  ('Bhaar-er Cha',              'Cutting chai served in a traditional clay cup',        3000,  'Chai & Coffee', '/menu/bhaar-er-cha.webp', 1),
+  ('Elaichi Malai Chai',       'Slow-boiled cardamom milk tea',                        5000,  'Chai & Coffee', '/menu/elaichi-malai-chai.webp', 2),
+  ('Cold Coffee with Ice Cream','Thick cold coffee topped with vanilla',               12000, 'Chai & Coffee', '/menu/cold-coffee.webp', 3),
   -- Breakfast
-  ('Kochuri & Aloor Dom',      'Flaky kochuri with Kolkata-style spiced potato curry', 9000,  'Breakfast', 1),
-  ('Ghugni Chaat',             'Yellow peas with onion, coriander and lime',           7000,  'Breakfast', 2),
-  ('Butter Toast & Omelette',  'Buttered toast with a fluffy masala omelette',         8000,  'Breakfast', 3),
+  ('Kochuri & Aloor Dom',      'Flaky kochuri with Kolkata-style spiced potato curry', 9000,  'Breakfast', '/menu/kochuri-aloor-dom.webp', 1),
+  ('Ghugni Chaat',             'Yellow peas with onion, coriander and lime',           7000,  'Breakfast', '/menu/ghugni-chaat.webp', 2),
+  ('Butter Toast & Omelette',  'Buttered toast with a fluffy masala omelette',         8000,  'Breakfast', '/menu/butter-toast-omelette.webp', 3),
   -- Snacks
-  ('Beguni',                   'Batter-fried eggplant fritters',                       5000,  'Snacks', 1),
-  ('Mughlai Paratha',          'Egg-and-keema stuffed fried paratha',                  15000, 'Snacks', 2),
-  ('Fish Fry (Bhetki)',        'Bengali-style crumb-fried bhetki fillet',              18000, 'Snacks', 3),
+  ('Beguni',                   'Batter-fried eggplant fritters',                       5000,  'Snacks', '/menu/beguni.webp', 1),
+  ('Mughlai Paratha',          'Egg-and-keema stuffed fried paratha',                  15000, 'Snacks', '/menu/mughlai-paratha.webp', 2),
+  ('Fish Fry (Bhetki)',        'Bengali-style crumb-fried bhetki fillet',              18000, 'Snacks', '/menu/fish-fry-bhetki.webp', 3),
   -- Rolls & Kathi
-  ('Kosha Mangsho Kathi Roll', 'Slow-cooked spicy mutton in a flaky paratha',          18000, 'Rolls & Kathi', 1),
-  ('Chicken Egg Roll',         'Classic Kolkata chicken kathi roll with egg',          12000, 'Rolls & Kathi', 2),
-  ('Paneer Roll',              'Spiced paneer with onions and green chutney',           11000, 'Rolls & Kathi', 3),
-  ('Double Egg Chicken Roll',  'Double egg, double chicken, single happiness',         15000, 'Rolls & Kathi', 4),
+  ('Kosha Mangsho Kathi Roll', 'Slow-cooked spicy mutton in a flaky paratha',          18000, 'Rolls & Kathi', '/menu/kosha-mangsho-roll.webp', 1),
+  ('Chicken Egg Roll',         'Classic Kolkata chicken kathi roll with egg',          12000, 'Rolls & Kathi', '/menu/chicken-egg-roll.webp', 2),
+  ('Paneer Roll',              'Spiced paneer with onions and green chutney',           11000, 'Rolls & Kathi', '/menu/paneer-roll.webp', 3),
+  ('Double Egg Chicken Roll',  'Double egg, double chicken, single happiness',         15000, 'Rolls & Kathi', '/menu/double-egg-chicken-roll.webp', 4),
   -- Mains
-  ('Kosha Mangsho with Luchi', 'Rich slow-cooked mutton with puffed luchi',            26000, 'Mains', 1),
-  ('Chicken Kasha with Rice',  'Bengali dry chicken curry with steamed rice',          22000, 'Mains', 2),
-  ('Shorshe Bhetki with Rice', 'Bhetki in mustard gravy with steamed rice',            28000, 'Mains', 3),
+  ('Kosha Mangsho with Luchi', 'Rich slow-cooked mutton with puffed luchi',            26000, 'Mains', '/menu/kosha-mangsho-luchi.webp', 1),
+  ('Chicken Kasha with Rice',  'Bengali dry chicken curry with steamed rice',          22000, 'Mains', '/menu/chicken-kasha-rice.webp', 2),
+  ('Shorshe Bhetki with Rice', 'Bhetki in mustard gravy with steamed rice',            28000, 'Mains', '/menu/shorshe-bhetki-rice.webp', 3),
   -- Desserts
-  ('Nolen Gur Rosogolla (2 pc)','Date-palm jaggery rosogolla',                         8000,  'Desserts', 1),
-  ('Mishti Doi',               'Caramelised sweet yogurt in an earthen pot',           6000,  'Desserts', 2),
+  ('Nolen Gur Rosogolla (2 pc)','Date-palm jaggery rosogolla',                         8000,  'Desserts', '/menu/nolen-gur-rosogolla.webp', 1),
+  ('Mishti Doi',               'Caramelised sweet yogurt in an earthen pot',           6000,  'Desserts', '/menu/mishti-doi.webp', 2),
   -- Beverages
-  ('Aam Pora Shorbot',         'Smoked raw-mango summer cooler',                       7000,  'Beverages', 1),
-  ('Gondhoraj Ghol',           'Lime-leaf spiced buttermilk',                          6000,  'Beverages', 2);
+  ('Aam Pora Shorbot',         'Smoked raw-mango summer cooler',                       7000,  'Beverages', '/menu/aam-pora-shorbot.webp', 1),
+  ('Gondhoraj Ghol',           'Lime-leaf spiced buttermilk',                          6000,  'Beverages', '/menu/gondhoraj-ghol.webp', 2);
 
 -- ---- Sample orders (mixed statuses so the dashboard looks alive) ------------
 -- Each block inserts an order + its items (price snapshotted from menu_items),

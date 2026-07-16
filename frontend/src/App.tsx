@@ -6,6 +6,8 @@ import CartPage from "@/features/cart/CartPage";
 import OurStoryPage from "@/features/story/OurStoryPage";
 import ContactPage from "@/features/contact/ContactPage";
 import DashboardPage from "@/features/dashboard/DashboardPage";
+import LoginPage from "@/features/dashboard/auth/LoginPage";
+import { RequireAuth } from "@/features/dashboard/auth/RequireAuth";
 
 export default function App() {
   return (
@@ -19,8 +21,16 @@ export default function App() {
         <Route path="/contact" element={<ContactPage />} />
       </Route>
 
-      {/* Owner area — separate from the public site (auth gate added in M6) */}
-      <Route path="/dashboard" element={<DashboardPage />} />
+      {/* Owner area — separate from the public site, behind auth */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/dashboard"
+        element={
+          <RequireAuth>
+            <DashboardPage />
+          </RequireAuth>
+        }
+      />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
