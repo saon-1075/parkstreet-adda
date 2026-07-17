@@ -8,6 +8,7 @@ import ContactPage from "@/features/contact/ContactPage";
 import DashboardLayout from "@/features/dashboard/DashboardLayout";
 import { OrderBoard } from "@/features/dashboard/orders/OrderBoard";
 import { MenuManager } from "@/features/dashboard/menu-admin/MenuManager";
+import { QrCodesPage } from "@/features/dashboard/qr/QrCodesPage";
 import LoginPage from "@/features/dashboard/auth/LoginPage";
 import { RequireAuth } from "@/features/dashboard/auth/RequireAuth";
 
@@ -35,6 +36,7 @@ export default function App() {
       >
         <Route index element={<OrderBoard />} />
         <Route path="menu" element={<MenuManager />} />
+        <Route path="qr" element={<QrCodesPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

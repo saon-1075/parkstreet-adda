@@ -10,6 +10,7 @@ import { useAuth } from "./auth/AuthProvider";
 const tabs = [
   { to: "/dashboard", label: "Orders", end: true },
   { to: "/dashboard/menu", label: "Menu", end: false },
+  { to: "/dashboard/qr", label: "QR codes", end: false },
 ];
 
 export default function DashboardLayout() {
@@ -18,7 +19,7 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-dvh bg-bg text-ink">
-      <header className="sticky top-0 z-30 border-b border-border bg-bg/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-border bg-bg/90 backdrop-blur print:hidden">
         <Container className="max-w-4xl">
           <div className="flex items-center justify-between py-3.5">
             <Link to="/dashboard" className="flex items-center gap-2.5">
@@ -75,7 +76,7 @@ export default function DashboardLayout() {
       <main>
         <Container className="max-w-4xl py-8">
           {isDemo && (
-            <p className="mb-5 rounded-xl border border-border bg-surface2/60 px-4 py-3 text-sm text-muted">
+            <p className="mb-5 rounded-xl border border-border bg-surface2/60 px-4 py-3 text-sm text-muted print:hidden">
               Demo mode — showing sample data. Connect Supabase to enable login, live
               orders, and saving menu changes.
             </p>

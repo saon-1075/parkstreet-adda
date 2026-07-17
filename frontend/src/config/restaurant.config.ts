@@ -34,6 +34,8 @@ export interface RestaurantConfig {
     enabled: boolean;
     /** Query param that carries the table id, e.g. ?table=5 */
     tableParam: string;
+    /** Number of tables to generate printable QR codes for. */
+    tableCount: number;
   };
   /** Controls the order categories render in on the menu. */
   categoryOrder: string[];
@@ -80,6 +82,7 @@ export const restaurant: RestaurantConfig = {
   dineIn: {
     enabled: true,
     tableParam: "table",
+    tableCount: 12,
   },
   categoryOrder: [
     "Chai & Coffee",
