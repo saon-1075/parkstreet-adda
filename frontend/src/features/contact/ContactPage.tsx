@@ -4,11 +4,13 @@ import { whatsappLink } from "@/lib/whatsapp";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { buttonVariants } from "@/components/ui/button";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { cn } from "@/lib/utils";
 
 export default function ContactPage() {
   const { contact } = restaurant;
   const telHref = `tel:${contact.phoneDisplay.replace(/\s+/g, "")}`;
+  useDocumentTitle("Contact");
 
   return (
     <Container className="max-w-3xl py-14 sm:py-20">

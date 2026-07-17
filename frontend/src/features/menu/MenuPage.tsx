@@ -3,6 +3,7 @@ import { useMenu } from "@/hooks/useMenu";
 import { useTableParam } from "@/hooks/useTableParam";
 import { slugify } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { CartBar } from "@/features/cart/CartBar";
 import { useCart } from "@/features/cart/CartProvider";
 import { CategoryNav } from "./CategoryNav";
@@ -13,6 +14,7 @@ export default function MenuPage() {
   const { setTable } = useCart();
   const { categories, loading, error } = useMenu();
   const [active, setActive] = useState("");
+  useDocumentTitle("Menu");
 
   // Capture the dine-in table from the QR (?table=) so it survives navigation
   // to checkout, where the URL param is no longer present.

@@ -3,10 +3,12 @@ import { Coffee } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function OurStoryPage() {
   const { story } = restaurant;
   const [imageFailed, setImageFailed] = useState(false);
+  useDocumentTitle("Our Story");
 
   return (
     <Container className="max-w-3xl py-14 sm:py-20">

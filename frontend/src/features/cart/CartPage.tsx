@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ShoppingBag, Trash2, ArrowLeft, CheckCircle2, MessageCircle } from "lucide-react";
 import { formatPaise } from "@/lib/money";
 import { Container } from "@/components/ui/Container";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { buttonVariants } from "@/components/ui/button";
 import { ItemImage } from "@/features/menu/ItemImage";
 import { placeOrder, type PlaceOrderResult } from "@/features/order/placeOrder";
@@ -18,6 +19,7 @@ export default function CartPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<PlaceOrderResult | null>(null);
+  useDocumentTitle("Your order");
 
   async function handleCheckout() {
     setSubmitting(true);

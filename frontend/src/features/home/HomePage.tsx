@@ -9,6 +9,7 @@ import { ItemImage } from "@/features/menu/ItemImage";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { buttonVariants } from "@/components/ui/button";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { cn } from "@/lib/utils";
 
 // A few crowd-pleasers to feature on the landing page.
@@ -23,6 +24,7 @@ export default function HomePage() {
   const { hero, highlights, story } = restaurant;
   const { categories } = useMenu();
   const [bannerFailed, setBannerFailed] = useState(false);
+  useDocumentTitle();
 
   const featured = useMemo<MenuItem[]>(() => {
     const items = categories.flatMap((c) => c.items);

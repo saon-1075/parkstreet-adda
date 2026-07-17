@@ -127,6 +127,16 @@
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
   }
+
+  /* Cart-count badge pop when an item is added. */
+  .badge-bump {
+    animation: badge-bump 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes badge-bump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -134,7 +144,8 @@
   .lift,
   .skeleton::after,
   .cart-backdrop,
-  .cart-panel {
+  .cart-panel,
+  .badge-bump {
     animation: none !important;
     transition: none !important;
   }

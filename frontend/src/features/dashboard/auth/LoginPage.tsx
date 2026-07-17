@@ -5,11 +5,13 @@ import { restaurant } from "@/config/restaurant.config";
 import { Container } from "@/components/ui/Container";
 import { buttonVariants } from "@/components/ui/button";
 import { BrandMark } from "@/components/ui/BrandMark";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useAuth } from "./AuthProvider";
 
 export default function LoginPage() {
   const { signIn, isDemo, session } = useAuth();
   const navigate = useNavigate();
+  useDocumentTitle("Owner sign in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

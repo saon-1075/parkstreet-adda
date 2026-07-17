@@ -4,6 +4,7 @@ import { restaurant } from "@/config/restaurant.config";
 import { Container } from "@/components/ui/Container";
 import { BrandMark } from "@/components/ui/BrandMark";
 import { cn } from "@/lib/utils";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useAuth } from "./auth/AuthProvider";
 
 const tabs = [
@@ -13,6 +14,7 @@ const tabs = [
 
 export default function DashboardLayout() {
   const { isDemo, signOut } = useAuth();
+  useDocumentTitle("Dashboard");
 
   return (
     <div className="min-h-dvh bg-bg text-ink">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { restaurant } from "@/config/restaurant.config";
@@ -121,6 +121,19 @@ export function NavBar() {
 /** Cart icon with a live item-count badge; opens the mini-cart drawer. */
 function CartButton() {
   const { totalQuantity, openCart } = useCart();
+  const [bump, setBump] = useState(false);
+  const prev = useRef(totalQuantity);
+
+  useEffect(() => {
+    if (totalQuantity > prev.current) {
+      setBump(true);
+      const t = setTimeout(() => setBump(false), 340);
+      prev.current = totalQuantity;
+      return () => clearTimeout(t);
+    }
+    prev.current = totalQuantity;
+  }, [totalQuantity]);
+
   return (
     <button
       type="button"
@@ -130,7 +143,12 @@ function CartButton() {
     >
       <ShoppingBag className="h-5 w-5" />
       {totalQuantity > 0 && (
-        <span className="absolute right-1 top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white tabular-nums">
+        <span
+          className={cn(
+            "absolute right-1 top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white tabular-nums",
+            bump && "badge-bump"
+          )}
+        >
           {totalQuantity}
         </span>
       )}
