@@ -1,11 +1,37 @@
-import type { OrderWithItems } from "@/types/db";
+import { useState } from "react";
+import { Loader2, Check } from "lucide-react";
+import type { OrderStatus, OrderWithItems } from "@/types/db";
 import { formatPaise } from "@/lib/money";
 import { timeAgo } from "@/lib/time";
 import { cn } from "@/lib/utils";
-import { STATUS_META } from "./status";
+import { buttonVariants } from "@/components/ui/button";
+import { STATUS_META, NEXT_STATUS, ADVANCE_LABEL, TERMINAL } from "./status";
 
-export function OrderCard({ order, isNew }: { order: OrderWithItems; isNew: boolean }) {
+export function OrderCard({
+  order,
+  isNew,
+  onStatusChange,
+}: {
+  order: OrderWithItems;
+  isNew: boolean;
+  onStatusChange: (id: string, status: OrderStatus) => Promise<void>;
+}) {
   const meta = STATUS_META[order.status];
+  const next = NEXT_STATUS[order.status];
+  const [pending, setPending] = useState<OrderStatus | null>(null);
+  const [error, setError] = useState(false);
+
+  async function change(status: OrderStatus) {
+    setPending(status);
+    setError(false);
+    try {
+      await onStatusChange(order.id, status);
+    } catch {
+      setError(true);
+    } finally {
+      setPending(null);
+    }
+  }
 
   return (
     <div
@@ -31,12 +57,7 @@ export function OrderCard({ order, isNew }: { order: OrderWithItems; isNew: bool
             {order.customer_name ? ` · ${order.customer_name}` : ""} · {timeAgo(order.created_at)}
           </p>
         </div>
-        <span
-          className={cn(
-            "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold",
-            meta.badge
-          )}
-        >
+        <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold", meta.badge)}>
           {meta.label}
         </span>
       </div>
@@ -66,6 +87,41 @@ export function OrderCard({ order, isNew }: { order: OrderWithItems; isNew: bool
           {formatPaise(order.total_paise)}
         </span>
       </div>
+
+      {/* Status actions */}
+      {!TERMINAL.has(order.status) && (
+        <div className="mt-4 flex items-center gap-2">
+          {next && (
+            <button
+              type="button"
+              disabled={pending !== null}
+              onClick={() => change(next)}
+              className={cn(buttonVariants({ variant: "primary", size: "sm" }), "flex-1 disabled:opacity-60")}
+            >
+              {pending === next ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+              {ADVANCE_LABEL[order.status]}
+            </button>
+          )}
+          <button
+            type="button"
+            disabled={pending !== null}
+            onClick={() => {
+              if (window.confirm(`Cancel order #${order.short_code}?`)) change("cancelled");
+            }}
+            className="rounded-xl px-3 py-2 text-sm font-medium text-muted hover:bg-surface2 hover:text-primary disabled:opacity-60"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <p className="mt-2 text-xs text-primary">Couldn't update — check your connection.</p>
+      )}
     </div>
   );
 }

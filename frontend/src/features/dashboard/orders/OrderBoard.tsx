@@ -8,7 +8,7 @@ type Filter = "active" | "done";
 const ACTIVE = new Set(["placed", "accepted", "preparing", "ready"]);
 
 export function OrderBoard() {
-  const { orders, loading, error, newIds } = useOrders();
+  const { orders, loading, error, newIds, updateStatus } = useOrders();
   const [filter, setFilter] = useState<Filter>("active");
 
   const counts = useMemo(() => {
@@ -78,7 +78,12 @@ export function OrderBoard() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {visible.map((order) => (
-            <OrderCard key={order.id} order={order} isNew={newIds.has(order.id)} />
+            <OrderCard
+              key={order.id}
+              order={order}
+              isNew={newIds.has(order.id)}
+              onStatusChange={updateStatus}
+            />
           ))}
         </div>
       )}

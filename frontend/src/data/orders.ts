@@ -1,8 +1,19 @@
 import { supabase } from "@/lib/supabase";
 import { hasSupabase } from "./menu";
-import type { OrderWithItems } from "@/types/db";
+import type { OrderStatus, OrderWithItems } from "@/types/db";
 
 const SELECT = "*, order_items(*)";
+
+/**
+ * Advance/cancel an order. With Supabase this UPDATEs the row (which the realtime
+ * feed echoes to every open board); in mock mode it's a no-op and the caller's
+ * optimistic local update is the only change.
+ */
+export async function setOrderStatus(id: string, status: OrderStatus): Promise<void> {
+  if (!hasSupabase) return;
+  const { error } = await supabase.from("orders").update({ status }).eq("id", id);
+  if (error) throw new Error(error.message);
+}
 
 /**
  * All orders, newest first, with their line items. Uses Supabase when
