@@ -6,21 +6,21 @@ import { Container } from "@/components/ui/Container";
 import { BrandMark } from "@/components/ui/BrandMark";
 
 const socialPill =
-  "inline-flex min-h-[36px] items-center rounded-full border border-border px-3 text-xs font-medium text-ink transition-colors hover:bg-surface";
+  "inline-flex min-h-[36px] items-center rounded-full border border-white/25 px-3 text-xs font-medium text-white transition-colors hover:bg-white/10";
 
 export function Footer() {
   const { contact, social } = restaurant;
 
   return (
-    <footer className="mt-20 border-t border-border bg-surface2/60">
+    <footer className="mt-20 bg-primary text-white">
       <Container className="grid gap-10 py-14 sm:grid-cols-3">
         {/* Brand */}
         <div>
           <div className="flex items-center gap-3">
             <BrandMark className="h-14 w-14" />
-            <p className="font-display text-lg font-semibold text-ink">{restaurant.name}</p>
+            <p className="font-display text-lg font-semibold text-white">{restaurant.name}</p>
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-muted">{restaurant.tagline}</p>
+          <p className="mt-3 text-sm leading-relaxed text-white/80">{restaurant.tagline}</p>
           <div className="mt-5 flex flex-wrap gap-2">
             {social.instagram && (
               <a href={social.instagram} target="_blank" rel="noreferrer" className={socialPill}>
@@ -40,9 +40,9 @@ export function Footer() {
 
         {/* Visit */}
         <div>
-          <p className="eyebrow mb-3">Visit</p>
-          <p className="flex items-start gap-2 text-sm leading-relaxed text-muted">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <p className="eyebrow eyebrow-invert mb-3">Visit</p>
+          <p className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-white/70" />
             <span>
               {contact.addressLines.map((line) => (
                 <span key={line} className="block">
@@ -55,13 +55,13 @@ export function Footer() {
 
         {/* Hours */}
         <div>
-          <p className="eyebrow mb-3">Hours</p>
-          <ul className="space-y-1.5 text-sm text-muted">
+          <p className="eyebrow eyebrow-invert mb-3">Hours</p>
+          <ul className="space-y-1.5 text-sm text-white/80">
             {contact.hours.map((h) => (
               <li key={h.days} className="flex items-start gap-2">
-                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-white/70" />
                 <span>
-                  <span className="text-ink">{h.days}</span> · {h.time}
+                  <span className="text-white">{h.days}</span> · {h.time}
                 </span>
               </li>
             ))}
@@ -69,12 +69,12 @@ export function Footer() {
         </div>
       </Container>
 
-      <div className="border-t border-border">
-        <Container className="flex flex-col items-center justify-between gap-2 py-5 text-xs text-muted sm:flex-row">
+      <div className="border-t border-white/15">
+        <Container className="flex flex-col items-center justify-between gap-2 py-5 text-xs text-white/70 sm:flex-row">
           <span>
             © {new Date().getFullYear()} {restaurant.name}. All rights reserved.
           </span>
-          <Link to="/menu" className="font-semibold uppercase tracking-eyebrow text-primary">
+          <Link to="/menu" className="font-semibold uppercase tracking-eyebrow text-white">
             {restaurant.hero.ctaLabel}
           </Link>
         </Container>
