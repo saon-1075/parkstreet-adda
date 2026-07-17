@@ -5,7 +5,9 @@ import MenuPage from "@/features/menu/MenuPage";
 import CartPage from "@/features/cart/CartPage";
 import OurStoryPage from "@/features/story/OurStoryPage";
 import ContactPage from "@/features/contact/ContactPage";
-import DashboardPage from "@/features/dashboard/DashboardPage";
+import DashboardLayout from "@/features/dashboard/DashboardLayout";
+import { OrderBoard } from "@/features/dashboard/orders/OrderBoard";
+import { MenuManager } from "@/features/dashboard/menu-admin/MenuManager";
 import LoginPage from "@/features/dashboard/auth/LoginPage";
 import { RequireAuth } from "@/features/dashboard/auth/RequireAuth";
 
@@ -27,10 +29,13 @@ export default function App() {
         path="/dashboard"
         element={
           <RequireAuth>
-            <DashboardPage />
+            <DashboardLayout />
           </RequireAuth>
         }
-      />
+      >
+        <Route index element={<OrderBoard />} />
+        <Route path="menu" element={<MenuManager />} />
+      </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

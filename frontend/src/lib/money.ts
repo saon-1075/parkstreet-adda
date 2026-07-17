@@ -14,3 +14,16 @@ export function formatPaise(paise: number, currency = restaurant.currency): stri
     : rupees.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return `${currency}${body}`;
 }
+
+/** Parse a rupee input ("120", "₹120.50") to integer paise. NaN if invalid. */
+export function rupeesToPaise(input: string): number {
+  const rupees = parseFloat(input.replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(rupees) || rupees < 0) return NaN;
+  return Math.round(rupees * 100);
+}
+
+/** Paise → a plain rupee string for editing in an input (no currency symbol). */
+export function paiseToRupeeInput(paise: number): string {
+  const rupees = paise / 100;
+  return Number.isInteger(rupees) ? String(rupees) : rupees.toFixed(2);
+}
