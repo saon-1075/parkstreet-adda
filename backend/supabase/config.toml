@@ -1,0 +1,6 @@
+project_id = "ekmtsjkdqjqgixqtdtjt"
+
+# Razorpay payments function — public (customers aren't logged in); it does its
+# own security via server-side signature verification.
+[functions.razorpay]
+verify_jwt = false
