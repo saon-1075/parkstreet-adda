@@ -77,7 +77,7 @@ export const restaurant: RestaurantConfig = {
   // Circular brand seal, served from frontend/public/brand/. Shown beside the
   // wordmark in the nav/footer; falls back to the wordmark alone if absent.
   logoUrl: "/brand/logo.webp",
-  whatsappNumber: "919830000000", // demo placeholder — swap for the owner's real number
+  whatsappNumber: "918240705408", // 91 (India) + 8240705408
   currency: "₹",
   dineIn: {
     enabled: true,
@@ -121,7 +121,7 @@ export const restaurant: RestaurantConfig = {
   },
   contact: {
     addressLines: ["12 Park Street", "Kolkata 700016, West Bengal"],
-    phoneDisplay: "+91 98300 00000",
+    phoneDisplay: "+91 82407 05408",
     hours: [
       { days: "Mon – Fri", time: "8:00 AM – 11:00 PM" },
       { days: "Sat – Sun", time: "9:00 AM – 12:00 AM" },
