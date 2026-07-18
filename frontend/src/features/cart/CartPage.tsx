@@ -6,12 +6,16 @@ import { Container } from "@/components/ui/Container";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { buttonVariants } from "@/components/ui/button";
 import { ItemImage } from "@/features/menu/ItemImage";
-import { placeOrder, type PlaceOrderResult } from "@/features/order/placeOrder";
-import { openRazorpayCheckout, hasRazorpay, PaymentDismissed } from "@/features/order/razorpay";
+import { placeOrder } from "@/features/order/placeOrder";
+import { payWithRazorpay, hasRazorpay, PaymentDismissed } from "@/features/order/razorpay";
 import { useCart } from "./CartProvider";
 import { QtyStepper } from "./QtyStepper";
 
-type Confirmation = PlaceOrderResult & { paid: boolean };
+interface Confirmation {
+  shortCode: string;
+  paid: boolean;
+  whatsappUrl?: string;
+}
 
 export default function CartPage() {
   const { lines, totalQuantity, totalPaise, increment, decrement, remove, clear, tableLabel } =
@@ -31,7 +35,7 @@ export default function CartPage() {
       const result = await placeOrder({ lines, tableLabel, customerName: name, note });
       // Best-effort auto-open; the confirmation screen has a manual link too.
       window.open(result.whatsappUrl, "_blank");
-      setConfirmation({ ...result, paid: false });
+      setConfirmation({ shortCode: result.shortCode, whatsappUrl: result.whatsappUrl, paid: false });
       clear();
     } catch (e) {
       setError(
@@ -46,19 +50,8 @@ export default function CartPage() {
     setSubmitting("pay");
     setError(null);
     try {
-      const { paymentId } = await openRazorpayCheckout({
-        amountPaise: totalPaise,
-        description: `Order · ${totalQuantity} ${totalQuantity === 1 ? "item" : "items"}`,
-        prefillName: name,
-      });
-      const result = await placeOrder({
-        lines,
-        tableLabel,
-        customerName: name,
-        note,
-        paymentRef: paymentId,
-      });
-      setConfirmation({ ...result, paid: true });
+      const { shortCode } = await payWithRazorpay({ lines, tableLabel, customerName: name, note });
+      setConfirmation({ shortCode, paid: true });
       clear();
     } catch (e) {
       if (e instanceof PaymentDismissed) return; // customer closed the modal

@@ -10,8 +10,6 @@ export interface PlaceOrderInput {
   tableLabel: string | null;
   customerName?: string;
   note?: string;
-  /** Razorpay payment id — when set, the order is recorded as paid. */
-  paymentRef?: string;
 }
 
 export interface PlaceOrderResult {
@@ -61,7 +59,6 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
       table_label: input.tableLabel ?? null,
       customer_name: input.customerName?.trim() || null,
       note: input.note?.trim() || null,
-      payment_ref: input.paymentRef ?? null,
       items: input.lines.map((l) => ({ menu_item_id: l.id, quantity: l.quantity })),
     };
     const { data, error } = await supabase.rpc("place_order", { payload });

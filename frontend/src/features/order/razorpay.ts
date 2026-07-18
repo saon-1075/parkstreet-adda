@@ -1,4 +1,6 @@
+import { supabase } from "@/lib/supabase";
 import { restaurant } from "@/config/restaurant.config";
+import type { CartLine } from "@/features/cart/CartProvider";
 
 /** True when a Razorpay publishable key is configured → show "Pay online". */
 export const hasRazorpay = Boolean(import.meta.env.VITE_RAZORPAY_KEY_ID);
@@ -11,8 +13,10 @@ export class PaymentDismissed extends Error {
   }
 }
 
-interface RazorpayResponse {
+interface CheckoutResponse {
   razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
 }
 interface RazorpayInstance {
   open: () => void;
@@ -21,7 +25,6 @@ interface RazorpayInstance {
 type RazorpayCtor = new (options: Record<string, unknown>) => RazorpayInstance;
 
 let scriptPromise: Promise<void> | null = null;
-
 function loadScript(): Promise<void> {
   if (scriptPromise) return scriptPromise;
   scriptPromise = new Promise((resolve, reject) => {
@@ -38,16 +41,37 @@ function loadScript(): Promise<void> {
   return scriptPromise;
 }
 
+async function callFn(body: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke("razorpay", { body });
+  if (error) throw new Error("Payment service is unavailable right now.");
+  if (!data?.ok) throw new Error(data?.error ?? "Payment failed.");
+  return data as Record<string, unknown>;
+}
+
+export interface PayInput {
+  lines: CartLine[];
+  tableLabel: string | null;
+  customerName?: string;
+  note?: string;
+}
+
 /**
- * Open Razorpay Checkout for the given amount (paise). Resolves with the payment
- * id on success, rejects with PaymentDismissed if the customer closes it, or an
- * Error on failure. Uses only the publishable key_id (safe in the browser).
+ * Full verified Razorpay flow:
+ *   1) Edge Function creates the order (amount priced server-side)
+ *   2) Razorpay Checkout collects payment (publishable key only)
+ *   3) Edge Function verifies the signature with the secret, then persists the
+ *      order as PAID and returns its short code.
  */
-export async function openRazorpayCheckout(opts: {
-  amountPaise: number;
-  description: string;
-  prefillName?: string;
-}): Promise<{ paymentId: string }> {
+export async function payWithRazorpay(input: PayInput): Promise<{ shortCode: string }> {
+  const items = input.lines.map((l) => ({ menu_item_id: l.id, quantity: l.quantity }));
+  const meta = {
+    items,
+    table_label: input.tableLabel,
+    customer_name: input.customerName?.trim() || null,
+    note: input.note?.trim() || null,
+  };
+
+  const created = await callFn({ action: "create", ...meta });
   await loadScript();
   const Razorpay = (window as { Razorpay?: RazorpayCtor }).Razorpay;
   if (!Razorpay) throw new Error("Razorpay failed to load.");
@@ -56,17 +80,17 @@ export async function openRazorpayCheckout(opts: {
     getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim() ||
     "#A15E2E";
 
-  return new Promise((resolve, reject) => {
+  const checkout = await new Promise<CheckoutResponse>((resolve, reject) => {
     const rzp = new Razorpay({
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: opts.amountPaise, // in paise
-      currency: "INR",
+      order_id: created.razorpay_order_id,
+      amount: created.amount,
+      currency: created.currency ?? "INR",
       name: restaurant.name,
-      description: opts.description,
-      prefill: opts.prefillName ? { name: opts.prefillName } : undefined,
+      description: "Order",
+      prefill: input.customerName ? { name: input.customerName } : undefined,
       theme: { color: primary },
-      handler: (resp: unknown) =>
-        resolve({ paymentId: (resp as RazorpayResponse).razorpay_payment_id }),
+      handler: (resp: unknown) => resolve(resp as CheckoutResponse),
       modal: { ondismiss: () => reject(new PaymentDismissed()) },
     });
     rzp.on("payment.failed", (resp: unknown) => {
@@ -75,4 +99,14 @@ export async function openRazorpayCheckout(opts: {
     });
     rzp.open();
   });
+
+  const verified = await callFn({
+    action: "verify",
+    razorpay_order_id: checkout.razorpay_order_id,
+    razorpay_payment_id: checkout.razorpay_payment_id,
+    razorpay_signature: checkout.razorpay_signature,
+    ...meta,
+  });
+
+  return { shortCode: verified.short_code as string };
 }
