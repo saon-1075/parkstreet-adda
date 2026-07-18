@@ -41,8 +41,12 @@ function loadScript(): Promise<void> {
   return scriptPromise;
 }
 
+// The deployed Edge Function slug. Defaults to "razorpay"; override with
+// VITE_RAZORPAY_FUNCTION if Supabase auto-named it something else.
+const RZP_FUNCTION = import.meta.env.VITE_RAZORPAY_FUNCTION || "razorpay";
+
 async function callFn(body: Record<string, unknown>) {
-  const { data, error } = await supabase.functions.invoke("razorpay", { body });
+  const { data, error } = await supabase.functions.invoke(RZP_FUNCTION, { body });
   if (error) throw new Error("Payment service is unavailable right now.");
   if (!data?.ok) throw new Error(data?.error ?? "Payment failed.");
   return data as Record<string, unknown>;

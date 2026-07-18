@@ -87,7 +87,7 @@ async function hmacHex(message: string, secret: string): Promise<string> {
 }
 
 const shortCode = () =>
-  Math.random().toString(16).slice(2, 6).toUpperCase();
+  crypto.randomUUID().replace(/-/g, "").slice(0, 4).toUpperCase();
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
