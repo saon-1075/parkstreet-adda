@@ -44,6 +44,7 @@ export interface Order {
   note: string | null;
   status: OrderStatus;
   payment_status: PaymentStatus;
+  payment_ref: string | null;
   total_paise: number;
   created_at: string;
   updated_at: string;

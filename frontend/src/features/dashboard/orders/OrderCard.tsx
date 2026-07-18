@@ -57,9 +57,16 @@ export function OrderCard({
             {order.customer_name ? ` · ${order.customer_name}` : ""} · {timeAgo(order.created_at)}
           </p>
         </div>
-        <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold", meta.badge)}>
-          {meta.label}
-        </span>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {order.payment_status === "paid" && (
+            <span className="rounded-full bg-whatsapp/15 px-2.5 py-1 text-xs font-semibold text-whatsapp">
+              Paid
+            </span>
+          )}
+          <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", meta.badge)}>
+            {meta.label}
+          </span>
+        </div>
       </div>
 
       <ul className="mt-3 space-y-1 border-t border-border pt-3 text-sm">

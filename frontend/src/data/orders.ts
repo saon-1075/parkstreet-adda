@@ -70,6 +70,7 @@ function buildMockOrders(): OrderWithItems[] {
       note,
       status,
       payment_status: "unpaid",
+      payment_ref: null,
       total_paise: order_items.reduce((s, l) => s + l.line_total_paise, 0),
       created_at: minsAgo(createdMinsAgo),
       updated_at: minsAgo(createdMinsAgo),

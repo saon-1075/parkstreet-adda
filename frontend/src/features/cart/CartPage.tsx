@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Trash2, ArrowLeft, CheckCircle2, MessageCircle } from "lucide-react";
+import { ShoppingBag, Trash2, ArrowLeft, CheckCircle2, MessageCircle, CreditCard } from "lucide-react";
 import { formatPaise } from "@/lib/money";
 import { Container } from "@/components/ui/Container";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { buttonVariants } from "@/components/ui/button";
 import { ItemImage } from "@/features/menu/ItemImage";
 import { placeOrder, type PlaceOrderResult } from "@/features/order/placeOrder";
+import { openRazorpayCheckout, hasRazorpay, PaymentDismissed } from "@/features/order/razorpay";
 import { useCart } from "./CartProvider";
 import { QtyStepper } from "./QtyStepper";
+
+type Confirmation = PlaceOrderResult & { paid: boolean };
 
 export default function CartPage() {
   const { lines, totalQuantity, totalPaise, increment, decrement, remove, clear, tableLabel } =
@@ -16,26 +19,52 @@ export default function CartPage() {
 
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState<null | "whatsapp" | "pay">(null);
   const [error, setError] = useState<string | null>(null);
-  const [confirmation, setConfirmation] = useState<PlaceOrderResult | null>(null);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   useDocumentTitle("Your order");
 
   async function handleCheckout() {
-    setSubmitting(true);
+    setSubmitting("whatsapp");
     setError(null);
     try {
       const result = await placeOrder({ lines, tableLabel, customerName: name, note });
       // Best-effort auto-open; the confirmation screen has a manual link too.
       window.open(result.whatsappUrl, "_blank");
-      setConfirmation(result);
+      setConfirmation({ ...result, paid: false });
       clear();
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "We couldn't place your order. Please try again."
       );
     } finally {
-      setSubmitting(false);
+      setSubmitting(null);
+    }
+  }
+
+  async function handlePayOnline() {
+    setSubmitting("pay");
+    setError(null);
+    try {
+      const { paymentId } = await openRazorpayCheckout({
+        amountPaise: totalPaise,
+        description: `Order · ${totalQuantity} ${totalQuantity === 1 ? "item" : "items"}`,
+        prefillName: name,
+      });
+      const result = await placeOrder({
+        lines,
+        tableLabel,
+        customerName: name,
+        note,
+        paymentRef: paymentId,
+      });
+      setConfirmation({ ...result, paid: true });
+      clear();
+    } catch (e) {
+      if (e instanceof PaymentDismissed) return; // customer closed the modal
+      setError(e instanceof Error ? e.message : "Payment couldn't be completed.");
+    } finally {
+      setSubmitting(null);
     }
   }
 
@@ -48,20 +77,26 @@ export default function CartPage() {
             <CheckCircle2 className="h-7 w-7 text-whatsapp" />
           </div>
           <h1 className="mt-5 font-display text-2xl font-semibold text-ink">
-            Order #{confirmation.shortCode} placed
+            {confirmation.paid
+              ? `Paid · Order #${confirmation.shortCode}`
+              : `Order #${confirmation.shortCode} placed`}
           </h1>
           <p className="mx-auto mt-2 max-w-sm text-pretty text-sm leading-relaxed text-muted">
-            We've opened WhatsApp with your order — just hit send. If it didn't open, tap below.
+            {confirmation.paid
+              ? "Payment received — your order is in. The kitchen has it."
+              : "We've opened WhatsApp with your order — just hit send. If it didn't open, tap below."}
           </p>
-          <a
-            href={confirmation.whatsappUrl}
-            target="_blank"
-            rel="noreferrer"
-            className={`${buttonVariants({ variant: "whatsapp", size: "lg" })} mt-6`}
-          >
-            <MessageCircle className="h-4 w-4" />
-            Open WhatsApp
-          </a>
+          {!confirmation.paid && (
+            <a
+              href={confirmation.whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={`${buttonVariants({ variant: "whatsapp", size: "lg" })} mt-6`}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Open WhatsApp
+            </a>
+          )}
           <div className="mt-6">
             <Link to="/menu" className="text-sm font-medium text-primary hover:opacity-80">
               Back to menu
@@ -204,17 +239,36 @@ export default function CartPage() {
           <p className="mt-4 rounded-lg bg-primary/10 px-3 py-2 text-sm text-primary">{error}</p>
         )}
 
+        {hasRazorpay && (
+          <>
+            <button
+              type="button"
+              onClick={handlePayOnline}
+              disabled={submitting !== null}
+              className={`${buttonVariants({ variant: "primary", size: "lg" })} mt-5 w-full disabled:opacity-60`}
+            >
+              <CreditCard className="h-4 w-4" />
+              {submitting === "pay" ? "Opening payment…" : `Pay ${formatPaise(totalPaise)} online`}
+            </button>
+            <div className="my-3 flex items-center gap-3 text-xs text-muted">
+              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+            </div>
+          </>
+        )}
+
         <button
           type="button"
           onClick={handleCheckout}
-          disabled={submitting}
-          className={`${buttonVariants({ variant: "whatsapp", size: "lg" })} mt-5 w-full disabled:opacity-60`}
+          disabled={submitting !== null}
+          className={`${buttonVariants({ variant: "whatsapp", size: "lg" })} ${hasRazorpay ? "" : "mt-5"} w-full disabled:opacity-60`}
         >
           <MessageCircle className="h-4 w-4" />
-          {submitting ? "Placing order…" : "Order on WhatsApp"}
+          {submitting === "whatsapp" ? "Placing order…" : "Order on WhatsApp"}
         </button>
         <p className="mt-2 text-center text-xs text-muted">
-          Opens WhatsApp with your order pre-filled — you just hit send.
+          {hasRazorpay
+            ? "Pay now, or send your order on WhatsApp to pay at the counter."
+            : "Opens WhatsApp with your order pre-filled — you just hit send."}
         </p>
       </div>
     </Container>
