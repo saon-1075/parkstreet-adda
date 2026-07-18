@@ -30,3 +30,7 @@ Thumbs.db
 
 # vercel
 .vercel
+
+# supabase cli
+backend/supabase/.temp/
+backend/supabase/.branches/
